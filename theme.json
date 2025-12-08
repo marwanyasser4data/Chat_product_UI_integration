@@ -1,0 +1,34 @@
+{
+    "colors": {
+        "primary": "#000000",
+        "primary_dark": "#000000",
+        "primary_light": "#000000",
+        "secondary": "#1e88e5",
+        "background": "#ffffff",
+        "sidebar": "#ffffff",
+        "sidebar_text": "#000000",
+        "text_primary": "#000000",
+        "text_secondary": "#000000",
+        "user_msg_bg": "#ffffff",
+        "bot_msg_bg": "#ffffff",
+        "ai_badge_bg": "#00a651",
+        "taskbar_icons_color": "#ffffff",
+        "app_title_color": "#ac069e",
+        "header_bar_bg_color": "#000000",
+        "widget_bg_color": "#000000",
+        "widget_border_color": "#000000",
+        "widget_title_color": "#ffffff",
+        "widget_text_color": "#ffffff",
+        "widget_icon_ai": "#000000",
+        "widget_icon_chat": "#0078d4",
+        "widget_icon_system": "#00a651",
+        "widget_icon_actions": "#ff6b6b"
+    },
+    "font": "Cairo",
+    "logo": {
+        "type": "image",
+        "text": "",
+        "url": "/static/uploads/8cdae2663ec8e883_download_8.jpg"
+    },
+    "background_image": "/static/uploads/7bfdc0256681ca10_pexels-photospublic-33041.jpg"
+}

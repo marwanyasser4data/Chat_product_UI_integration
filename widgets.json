@@ -1,0 +1,52 @@
+{
+    "widgets": [
+        {
+            "id": "ai-models",
+            "name": "نماذج الذكاء الاصطناعي",
+            "name_en": "AI Models",
+            "type": "ai-models",
+            "icon": "robot",
+            "active": true,
+            "order": 1,
+            "html_content": "",
+            "created_at": "2025-01-01T00:00:00",
+            "updated_at": "2025-12-07T14:39:28.333673"
+        },
+        {
+            "id": "chat-stats",
+            "name": "إحصائيات الدردشة",
+            "name_en": "Chat Stats",
+            "type": "stats",
+            "icon": "chat",
+            "active": true,
+            "order": 2,
+            "html_content": "",
+            "created_at": "2025-01-01T00:00:00",
+            "updated_at": "2025-01-01T00:00:00"
+        },
+        {
+            "id": "system-status",
+            "name": "حالة النظام",
+            "name_en": "System Status",
+            "type": "system",
+            "icon": "monitor",
+            "active": true,
+            "order": 3,
+            "html_content": "",
+            "created_at": "2025-01-01T00:00:00",
+            "updated_at": "2025-01-01T00:00:00"
+        },
+        {
+            "id": "quick-actions",
+            "name": "إجراءات سريعة",
+            "name_en": "Quick Actions",
+            "type": "actions",
+            "icon": "bolt",
+            "active": true,
+            "order": 4,
+            "html_content": "",
+            "created_at": "2025-01-01T00:00:00",
+            "updated_at": "2025-01-01T00:00:00"
+        }
+    ]
+}

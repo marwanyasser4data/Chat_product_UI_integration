@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataScienve - LLM Chat</title>
+    <link rel="stylesheet" id="themeStylesheet"
+        href="{{ url_for('static', filename='style-' + theme + '.css') }}?v={{ timestamp }}">
+    <link rel="stylesheet" href="/custom-theme.css?v={{ timestamp }}">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="vr-background"></div>
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    {% if theme_settings.logo.type == 'image' and theme_settings.logo.url %}
+                    <img src="{{ theme_settings.logo.url }}" alt="Logo" class="logo-image" style="max-height: 40px;">
+                    {% else %}
+                    <div class="logo-icon">{{ theme_settings.logo.text or 'DS' }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button class="new-chat-btn" onclick="newChat()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span data-i18n="newChat">محادثة جديدة</span>
+            </button>
+
+            <div class="chat-history">
+                <div class="history-header">
+                    <h3 class="history-title" data-i18n="chatHistory">سجل المحادثات</h3>
+                    <button class="clear-history-btn" onclick="clearAllHistory()" title="حذف الكل">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="no-history" data-i18n="noHistory">لا توجد محادثات سابقة</div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="language-switcher">
+                    <button class="lang-btn {{ 'active' if lang == 'ar' else '' }}"
+                        onclick="changeLanguage('ar')">عربي</button>
+                    <button class="lang-btn {{ 'active' if lang == 'en' else '' }}"
+                        onclick="changeLanguage('en')">English</button>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">{{ session.get('user_display_name', 'مستخدم')[0] }}</div>
+                    <div class="user-details">
+                        <div class="user-name">{{ session.get('user_display_name', 'مستخدم') }}</div>
+                        <div class="user-email">{{ session.get('username', 'user') }}@datascienve.com</div>
+                    </div>
+                    {% if user_role == 'admin' %}
+                    <button class="settings-btn" onclick="showSettingsModal()" title="الإعدادات">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
+                        </svg>
+                    </button>
+                    {% endif %}
+                    <button class="logout-btn" onclick="logout()" title="تسجيل الخروج">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="chat-header">
+                <div class="header-content">
+                    <h1 class="header-title" data-i18n="appTitle">مساعد الذكاء الاصطناعي</h1>
+                    <p class="header-subtitle" data-i18n="appSubtitle">مساعد ذكي متقدم لخدمتك</p>
+                </div>
+                <div class="header-actions">
+                    {% if user_role == 'admin' %}
+                    <button class="action-btn dashboard-btn" onclick="window.location.href='/admin/dashboard'"
+                        title="لوحة التحكم">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                            <path d="M2 17l10 5 10-5" />
+                            <path d="M2 12l10 5 10-5" />
+                        </svg>
+                        <span>لوحة التحكم</span>
+                    </button>
+                    {% endif %}
+                    <button class="action-btn reset-btn" onclick="newChat()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                            <path d="M21 3v5h-5" />
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                            <path d="M3 21v-5h5" />
+                        </svg>
+                        <span data-i18n="resetSession">إعادة تعيين</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Chat Container -->
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome-message" id="welcomeMessage">
+                    <div class="orb-container">
+                        <div class="orb"></div>
+                        <div class="orb-glow"></div>
+                    </div>
+                    <div class="welcome-features">
+                        <div class="feature-item" data-i18n="feature1">
+                            � استكشاف البيانات والمعلومات
+                        </div>
+                        <div class="feature-item" data-i18n="feature2">
+                            � البحث والتحليل المتقدم
+                        </div>
+                    </div>
+                    <div class="suggestions-label" data-i18n="suggestionsLabel">جرب أحد هذه الأسئلة:</div>
+                    <div class="suggestions">
+                        <button class="suggestion-btn" onclick="sendSuggestion(t('suggestion1'))">
+                            <span data-i18n="suggestion1">ما هي خدمات NHC؟</span>
+                        </button>
+                        <button class="suggestion-btn" onclick="sendSuggestion(t('suggestion2'))">
+                            <span data-i18n="suggestion2">كيف يمكنني حجز وحدة سكنية؟</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <form id="chatForm" onsubmit="sendMessage(event)">
+                    <div class="input-container">
+                        <textarea id="messageInput" data-i18n="placeholder" placeholder="اسأل أي شيء..." rows="1"
+                            onkeydown="handleKeyPress(event)"></textarea>
+                        <div class="input-actions">
+                            <button type="button" class="icon-btn" title="إرفاق ملف">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                                </svg>
+                            </button>
+                            <button type="button" class="icon-btn" title="تسجيل صوتي">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                    <line x1="12" y1="19" x2="12" y2="23" />
+                                    <line x1="8" y1="23" x2="16" y2="23" />
+                                </svg>
+                            </button>
+                            <button type="submit" class="send-btn" id="sendBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                                </svg>
+                                <span data-i18n="send">إرسال</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-hint" data-i18n="inputHint">
+                        اضغط Enter للإرسال • Shift + Enter لسطر جديد
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-overlay" onclick="hideSettingsModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" data-i18n="settingsTitle">إعدادات النموذج</h2>
+                <button class="modal-close" onclick="hideSettingsModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Theme Selection -->
+                <div class="form-group">
+                    <label class="form-label" data-i18n="themeLabel">تصميم الواجهة</label>
+                    <div class="theme-selector">
+                        <div class="theme-option" data-theme="nhc" onclick="selectTheme('nhc')">
+                            <div class="theme-preview theme-nhc">
+                                <div class="preview-sidebar"></div>
+                                <div class="preview-main">
+                                    <div class="preview-header"></div>
+                                    <div class="preview-message"></div>
+                                    <div class="preview-message user"></div>
+                                </div>
+                            </div>
+                            <div class="theme-info">
+                                <div class="theme-name" data-i18n="themeNHC">NHC Professional</div>
+                                <div class="theme-desc" data-i18n="themeNHCDesc">تصميم احترافي بألوان NHC</div>
+                            </div>
+                            <div class="theme-check">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="theme-option" data-theme="readpo" onclick="selectTheme('readpo')">
+                            <div class="theme-preview theme-readpo">
+                                <div class="preview-sidebar"></div>
+                                <div class="preview-main">
+                                    <div class="preview-header"></div>
+                                    <div class="preview-message"></div>
+                                    <div class="preview-message user"></div>
+                                </div>
+                            </div>
+                            <div class="theme-info">
+                                <div class="theme-name" data-i18n="themeReadPo">ReadPo Dark</div>
+                                <div class="theme-desc" data-i18n="themeReadPoDesc">تصميم داكن عصري واحترافي</div>
+                            </div>
+                            <div class="theme-check">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="form-hint" data-i18n="themeHint">اختر التصميم المفضل لديك</small>
+                </div>
+
+                <div class="form-divider"></div>
+
+                <!-- Provider Selection -->
+                <div class="form-group">
+                    <label class="form-label" data-i18n="providerLabel">مزود الخدمة</label>
+                    <select id="providerSelect" class="form-select" onchange="onProviderChange()">
+                        <option value="fake" data-i18n="providerFake">تجريبي (بدون API)</option>
+                        <option value="openai" data-i18n="providerOpenAI">OpenAI</option>
+                        <option value="openrouter" data-i18n="providerOpenRouter">OpenRouter</option>
+                    </select>
+                    <small class="form-hint" data-i18n="providerHint">اختر مزود خدمة LLM</small>
+                </div>
+
+                <!-- Model Selection -->
+                <div class="form-group">
+                    <label class="form-label" data-i18n="modelLabel">النموذج</label>
+                    <select id="modelSelect" class="form-select">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <small class="form-hint" data-i18n="modelHint">اختر نموذج اللغة</small>
+                </div>
+
+                <!-- Temperature -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span data-i18n="temperatureLabel">درجة الإبداع (Temperature)</span>
+                        <span class="temperature-value" id="temperatureValue">0.7</span>
+                    </label>
+                    <input type="range" id="temperatureSlider" class="form-slider" min="0" max="2" step="0.1"
+                        value="0.7" oninput="onTemperatureChange(this.value)">
+                    <div class="slider-labels">
+                        <span data-i18n="tempLow">منخفض (دقيق)</span>
+                        <span data-i18n="tempHigh">عالي (إبداعي)</span>
+                    </div>
+                </div>
+
+                <!-- Max Tokens -->
+                <div class="form-group">
+                    <label class="form-label" data-i18n="maxTokensLabel">الحد الأقصى للرموز</label>
+                    <input type="number" id="maxTokensInput" class="form-input" min="100" max="4000" step="100"
+                        value="2000" data-i18n="maxTokensPlaceholder" placeholder="2000">
+                    <small class="form-hint" data-i18n="maxTokensHint">عدد الرموز في الاستجابة (100-4000)</small>
+                </div>
+
+                <!-- API Key -->
+                <div class="form-group" id="apiKeyContainer">
+                    <label class="form-label" data-i18n="apiKeyLabel">مفتاح API</label>
+                    <div class="api-key-input-group">
+                        <input type="password" id="apiKeyInput" class="form-input" data-i18n="apiKeyPlaceholder"
+                            placeholder="sk-...">
+                        <button type="button" class="btn-test" id="testApiKeyBtn" onclick="testApiKey()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                            <span data-i18n="testKeyBtn">اختبار المفتاح</span>
+                        </button>
+                    </div>
+                    <div id="testApiKeyResult" class="api-test-result" style="display: none;"></div>
+                    <small class="form-hint" data-i18n="apiKeyHint">سيتم تشفير المفتاح وحفظه بشكل آمن</small>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="hideSettingsModal()" data-i18n="cancelBtn">إلغاء</button>
+                <button class="btn-primary" id="saveSettingsBtn" onclick="saveSettings()" data-i18n="saveBtn">حفظ
+                    التغييرات</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const initialLang = "{{ lang }}";
+    </script>
+    <script src="{{ url_for('static', filename='translations.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v={{ timestamp }}"></script>
+    <script src="{{ url_for('static', filename='settings.js') }}"></script>
+</body>
+
+</html>

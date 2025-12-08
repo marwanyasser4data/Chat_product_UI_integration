@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ theme_settings.app_name or 'AI Assistant' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='desktop.css') }}?v={{ timestamp }}">
+    <link rel="stylesheet" href="/custom-theme.css?v={{ timestamp }}">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Desktop Background -->
+    <div class="desktop-background">
+        {% if theme_settings.background_image %}
+        <img src="{{ theme_settings.background_image }}" alt="Background" class="bg-image">
+        {% endif %}
+    </div>
+
+    <!-- Desktop Container -->
+    <div class="desktop-container">
+        <!-- Top Header Bar -->
+        <div class="top-header-bar">
+            <div class="header-brand">
+                {% if theme_settings.logo.type == 'image' and theme_settings.logo.url %}
+                <img src="{{ theme_settings.logo.url }}" alt="Logo" class="header-logo">
+                {% else %}
+                <div class="header-logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                    </svg>
+                </div>
+                {% endif %}
+                <span class="header-title">DataScience LLM Chat Model</span>
+            </div>
+            <div class="header-right">
+                <div class="header-status">
+                    <div class="status-dot online"></div>
+                    <span>AI Ready</span>
+                </div>
+                <div class="header-datetime">
+                    <span class="header-time" id="headerTime">00:00</span>
+                    <span class="header-date" id="headerDate">--/--/----</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Widgets Area -->
+        <div class="desktop-widgets" id="desktopWidgets">
+            <!-- Default Widgets - will be replaced by dynamic widgets if available -->
+            
+            <!-- AI Stats Widget -->
+            <div class="desktop-widget ai-widget" data-widget-id="ai-models">
+                <div class="widget-header">
+                    <div class="widget-icon ai-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                            <circle cx="7.5" cy="14.5" r="1.5"/>
+                            <circle cx="16.5" cy="14.5" r="1.5"/>
+                        </svg>
+                    </div>
+                    <span class="widget-title" data-i18n="aiModels">نماذج الذكاء الاصطناعي</span>
+                </div>
+                <div class="widget-body">
+                    <div class="model-item active">
+                        <div class="model-status online"></div>
+                        <div class="model-info">
+                            <span class="model-name">GPT-4</span>
+                            <span class="model-desc">متصل • جاهز</span>
+                        </div>
+                        <span class="model-badge primary">الافتراضي</span>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-status online"></div>
+                        <div class="model-info">
+                            <span class="model-name">Claude 3</span>
+                            <span class="model-desc">متصل</span>
+                        </div>
+                    </div>
+                    <div class="model-item">
+                        <div class="model-status offline"></div>
+                        <div class="model-info">
+                            <span class="model-name">Gemini Pro</span>
+                            <span class="model-desc">غير متصل</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Stats Widget -->
+            <div class="desktop-widget stats-card-widget" data-widget-id="chat-stats">
+                <div class="widget-header">
+                    <div class="widget-icon chat-stats-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </div>
+                    <span class="widget-title" data-i18n="chatStats">إحصائيات الدردشة</span>
+                </div>
+                <div class="widget-body">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalChats">156</div>
+                            <div class="stat-label" data-i18n="totalConversations">إجمالي المحادثات</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="todayChats">12</div>
+                            <div class="stat-label" data-i18n="todayConversations">محادثات اليوم</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalMessages">1.2K</div>
+                            <div class="stat-label" data-i18n="totalMessages">إجمالي الرسائل</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="avgResponseTime">1.3s</div>
+                            <div class="stat-label" data-i18n="avgResponse">متوسط الاستجابة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status Widget -->
+            <div class="desktop-widget system-widget" data-widget-id="system-status">
+                <div class="widget-header">
+                    <div class="widget-icon system-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <span class="widget-title" data-i18n="systemStatus">حالة النظام</span>
+                </div>
+                <div class="widget-body">
+                    <div class="system-status-item">
+                        <span class="status-label">API</span>
+                        <div class="status-bar">
+                            <div class="status-fill" style="width: 100%; background: linear-gradient(90deg, #00A651, #00D68F);"></div>
+                        </div>
+                        <span class="status-value success">متصل</span>
+                    </div>
+                    <div class="system-status-item">
+                        <span class="status-label">CPU</span>
+                        <div class="status-bar">
+                            <div class="status-fill" style="width: 45%; background: linear-gradient(90deg, #0078D4, #00BCF2);"></div>
+                        </div>
+                        <span class="status-value">45%</span>
+                    </div>
+                    <div class="system-status-item">
+                        <span class="status-label">Memory</span>
+                        <div class="status-bar">
+                            <div class="status-fill" style="width: 68%; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+                        </div>
+                        <span class="status-value">68%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Widget -->
+            <div class="desktop-widget actions-widget" data-widget-id="quick-actions">
+                <div class="widget-header">
+                    <div class="widget-icon actions-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <span class="widget-title" data-i18n="quickActions">إجراءات سريعة</span>
+                </div>
+                <div class="widget-body">
+                    <div class="quick-actions-grid">
+                        <button class="quick-action-btn" onclick="toggleWindow('chatWindow')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span data-i18n="newChat">محادثة جديدة</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="toggleWindow('settingsWindow')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                            <span data-i18n="settings">الإعدادات</span>
+                        </button>
+                        {% if user_role == 'admin' %}
+                        <button class="quick-action-btn" onclick="toggleWindow('adminWindow')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                            <span data-i18n="controlPanel">لوحة التحكم</span>
+                        </button>
+                        {% endif %}
+                        <button class="quick-action-btn" onclick="clearHistory()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                            <span data-i18n="clearHistory">مسح السجل</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Custom Widgets Container - Dynamic widgets will be added here -->
+            <div id="customWidgetsContainer"></div>
+        </div>
+
+        <!-- Windows Container -->
+        <div class="windows-container" id="windowsContainer">
+            <!-- Chat Window -->
+            <div class="app-window" id="chatWindow" style="display: none;">
+                <div class="window-header">
+                    <div class="window-title">
+                        <div class="window-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <span data-i18n="aiAssistant">مساعد الذكاء الاصطناعي</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="window-btn minimize" onclick="minimizeWindow('chatWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                            </svg>
+                        </button>
+                        <button class="window-btn maximize" onclick="toggleMaximize('chatWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            </svg>
+                        </button>
+                        <button class="window-btn close" onclick="closeWindow('chatWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <!-- Sidebar -->
+                    <aside class="chat-sidebar">
+                        <div class="sidebar-header">
+                            <div class="logo">
+                                {% if theme_settings.logo.type == 'image' and theme_settings.logo.url %}
+                                <img src="{{ theme_settings.logo.url }}" alt="Logo" class="logo-image">
+                                {% else %}
+                                <div class="logo-icon">{{ theme_settings.logo.text or 'AI' }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <button class="new-chat-btn" onclick="newChat()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            <span data-i18n="newChat">محادثة جديدة</span>
+                        </button>
+
+                        <div class="chat-history">
+                            <div class="history-header">
+                                <span data-i18n="chatHistory">سجل المحادثات</span>
+                            </div>
+                            <div class="history-list" id="chatHistoryList">
+                                <div class="no-history" data-i18n="noHistory">لا توجد محادثات سابقة</div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Chat Area -->
+                    <div class="chat-main">
+                        <!-- Enhanced Chat Header -->
+                        <div class="chat-header-enhanced">
+                            <div class="chat-header-left">
+                                <div class="chat-ai-indicator">
+                                    <div class="ai-pulse-ring"></div>
+                                    <div class="ai-avatar-mini">AI</div>
+                                </div>
+                                <div class="chat-title-info">
+                                    <h2 data-i18n="aiAssistant">مساعد الذكاء الاصطناعي</h2>
+                                    <div class="chat-status-bar">
+                                        <span class="status-indicator online"></span>
+                                        <span class="status-text" id="chatStatusText" data-i18n="readyToHelp">جاهز للمساعدة</span>
+                                        <span class="model-tag" id="currentModelTag">GPT-4o</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-header-actions">
+                                <button class="chat-action-btn" onclick="toggleChatSearch()" title="بحث في المحادثة">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"/>
+                                        <path d="M21 21l-4.35-4.35"/>
+                                    </svg>
+                                </button>
+                                <button class="chat-action-btn" onclick="exportChat()" title="تصدير المحادثة">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="7 10 12 15 17 10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                </button>
+                                <button class="chat-action-btn" onclick="toggleChatSettings()" title="إعدادات المحادثة">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="1"/>
+                                        <circle cx="19" cy="12" r="1"/>
+                                        <circle cx="5" cy="12" r="1"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Bar (Hidden by default) -->
+                        <div class="chat-search-bar" id="chatSearchBar" style="display: none;">
+                            <div class="search-input-wrapper">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                                <input type="text" id="chatSearchInput" placeholder="ابحث في الرسائل..." onkeyup="searchMessages(this.value)">
+                                <span class="search-results-count" id="searchResultsCount"></span>
+                                <button class="search-close-btn" onclick="toggleChatSearch()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M18 6L6 18M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Area -->
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="welcome-screen" id="welcomeScreen">
+                                <div class="ai-avatar">
+                                    <div class="moon-container">
+                                        <!-- Stars -->
+                                        <div class="moon-stars">
+                                            <div class="star star-1"></div>
+                                            <div class="star star-2"></div>
+                                            <div class="star star-3"></div>
+                                            <div class="star star-4"></div>
+                                            <div class="star star-5"></div>
+                                        </div>
+                                        
+                                        <!-- Moon -->
+                                        <div class="avatar-orb">
+                                            <span>AI</span>
+                                        </div>
+                                        
+                                        <!-- Clouds -->
+                                        <div class="clouds-container">
+                                            <div class="cloud cloud-1"></div>
+                                            <div class="cloud cloud-2"></div>
+                                            <div class="cloud cloud-3"></div>
+                                            <div class="cloud cloud-4"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h2 class="app-title">DataScience LLM AI Chat</h2>
+                                <p class="welcome-subtitle" data-i18n="welcomeMessage">مرحباً! كيف يمكنني مساعدتك اليوم؟</p>
+                                
+                                <!-- Quick Capabilities -->
+                                <div class="ai-capabilities">
+                                    <div class="capability-card" onclick="sendQuickMessage('اشرح لي مفهوم الذكاء الاصطناعي')">
+                                        <div class="capability-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                            </svg>
+                                        </div>
+                                        <span data-i18n="explainConcepts">اشرح المفاهيم</span>
+                                    </div>
+                                    <div class="capability-card" onclick="sendQuickMessage('ساعدني في كتابة كود برمجي')">
+                                        <div class="capability-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="16 18 22 12 16 6"/>
+                                                <polyline points="8 6 2 12 8 18"/>
+                                            </svg>
+                                        </div>
+                                        <span data-i18n="writeCode">اكتب كود</span>
+                                    </div>
+                                    <div class="capability-card" onclick="sendQuickMessage('حلل هذه البيانات')">
+                                        <div class="capability-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="20" x2="18" y2="10"/>
+                                                <line x1="12" y1="20" x2="12" y2="4"/>
+                                                <line x1="6" y1="20" x2="6" y2="14"/>
+                                            </svg>
+                                        </div>
+                                        <span data-i18n="analyzeData">حلل البيانات</span>
+                                    </div>
+                                    <div class="capability-card" onclick="sendQuickMessage('ترجم هذا النص')">
+                                        <div class="capability-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M5 8l6 6"/>
+                                                <path d="M4 14l6-6 2-3"/>
+                                                <path d="M2 5h12"/>
+                                                <path d="M7 2h1"/>
+                                                <path d="M22 22l-5-10-5 10"/>
+                                                <path d="M14 18h6"/>
+                                            </svg>
+                                        </div>
+                                        <span data-i18n="translate">ترجم نصاً</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Suggested Prompts -->
+                                <div class="suggested-prompts">
+                                    <p class="prompts-title" data-i18n="tryAsking">جرب أن تسأل:</p>
+                                    <div class="prompts-grid">
+                                        <button class="prompt-chip" onclick="sendQuickMessage('ما هي أفضل ممارسات البرمجة؟')">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                            </svg>
+                                            أفضل ممارسات البرمجة
+                                        </button>
+                                        <button class="prompt-chip" onclick="sendQuickMessage('اكتب لي قصة قصيرة إبداعية')">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                                            </svg>
+                                            قصة إبداعية
+                                        </button>
+                                        <button class="prompt-chip" onclick="sendQuickMessage('كيف أتعلم machine learning؟')">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                                            </svg>
+                                            تعلم Machine Learning
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Input Area -->
+                        <div class="chat-input-area-enhanced">
+                            <!-- Attachments Preview -->
+                            <div class="attachments-preview" id="attachmentsPreview" style="display: none;">
+                                <div class="attachments-list" id="attachmentsList"></div>
+                            </div>
+                            
+                            <!-- Main Input Container -->
+                            <div class="input-container-modern">
+                                <div class="input-tools-left">
+                                    <button class="tool-btn" onclick="attachFile()" title="إرفاق ملف">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                                        </svg>
+                                    </button>
+                                    <button class="tool-btn" onclick="insertEmoji()" title="إضافة إيموجي">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                                            <line x1="15" y1="9" x2="15.01" y2="9"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                
+                                <div class="input-field-wrapper">
+                                    <textarea id="messageInput" 
+                                              placeholder="اكتب رسالتك هنا... استخدم @ للإشارة، / للأوامر" 
+                                              data-i18n-placeholder="typeMessageAdvanced"
+                                              rows="1"
+                                              onkeydown="handleInputKeydown(event)"
+                                              oninput="autoResizeTextarea(this)"></textarea>
+                                    <div class="input-char-count" id="charCount">0</div>
+                                </div>
+                                
+                                <div class="input-tools-right">
+                                    <button class="tool-btn voice-btn" onclick="toggleVoiceInput()" title="إدخال صوتي" id="voiceBtn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                            <line x1="12" y1="19" x2="12" y2="23"/>
+                                            <line x1="8" y1="23" x2="16" y2="23"/>
+                                        </svg>
+                                        <div class="voice-wave" id="voiceWave">
+                                            <span></span><span></span><span></span><span></span>
+                                        </div>
+                                    </button>
+                                    <button class="send-btn-modern" onclick="sendMessage()" id="sendBtn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="22" y1="2" x2="11" y2="13"/>
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Input Hints -->
+                            <div class="input-hints">
+                                <span class="hint-item">
+                                    <kbd>Enter</kbd> إرسال
+                                </span>
+                                <span class="hint-item">
+                                    <kbd>Shift+Enter</kbd> سطر جديد
+                                </span>
+                                <span class="hint-item">
+                                    <kbd>/</kbd> أوامر سريعة
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Window - Advanced -->
+            <div class="app-window settings-window-large" id="settingsWindow" style="display: none;">
+                <div class="window-header">
+                    <div class="window-title">
+                        <div class="window-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                        </div>
+                        <span data-i18n="settings">الإعدادات</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="window-btn minimize" onclick="minimizeWindow('settingsWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                            </svg>
+                        </button>
+                        <button class="window-btn maximize" onclick="toggleMaximize('settingsWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            </svg>
+                        </button>
+                        <button class="window-btn close" onclick="closeWindow('settingsWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="window-content settings-layout">
+                    <!-- Settings Sidebar -->
+                    <div class="settings-sidebar">
+                        <div class="settings-nav">
+                            <button class="settings-nav-item active" onclick="showSettingsTab('general')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09"/>
+                                </svg>
+                                <span data-i18n="generalTab">عام</span>
+                            </button>
+                            <button class="settings-nav-item" onclick="showSettingsTab('ai')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                                </svg>
+                                <span data-i18n="aiTab">الذكاء الاصطناعي</span>
+                            </button>
+                            <button class="settings-nav-item" onclick="showSettingsTab('chat')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                <span data-i18n="chatTab">المحادثة</span>
+                            </button>
+                            <button class="settings-nav-item" onclick="showSettingsTab('voice')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                    <line x1="12" y1="19" x2="12" y2="23"/>
+                                    <line x1="8" y1="23" x2="16" y2="23"/>
+                                </svg>
+                                <span data-i18n="voiceTab">الصوت والنطق</span>
+                            </button>
+                            <button class="settings-nav-item" onclick="showSettingsTab('privacy')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                                <span data-i18n="privacyTab">الخصوصية والأمان</span>
+                            </button>
+                            <button class="settings-nav-item" onclick="showSettingsTab('notifications')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                </svg>
+                                <span data-i18n="notificationsTab">الإشعارات</span>
+                            </button>
+                            <button class="settings-nav-item" onclick="showSettingsTab('accessibility')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                    <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
+                                </svg>
+                                <span data-i18n="accessibilityTab">إمكانية الوصول</span>
+                            </button>
+                            <button class="settings-nav-item" onclick="showSettingsTab('advanced')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="16 18 22 12 16 6"/>
+                                    <polyline points="8 6 2 12 8 18"/>
+                                </svg>
+                                <span data-i18n="advancedTab">متقدم</span>
+                            </button>
+                            <button class="settings-nav-item" onclick="showSettingsTab('about')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="16" x2="12" y2="12"/>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                </svg>
+                                <span data-i18n="aboutTab">حول التطبيق</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Settings Content -->
+                    <div class="settings-content-area">
+                        <!-- General Settings -->
+                        <div class="settings-tab active" id="tab-general">
+                            <h2 class="settings-tab-title" data-i18n="generalSettings">الإعدادات العامة</h2>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="languageRegion">اللغة والمنطقة</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="interfaceLanguage">لغة الواجهة</span>
+                                        <span class="setting-desc" data-i18n="chooseAppLanguage">اختر لغة عرض التطبيق</span>
+                                    </div>
+                                    <div class="language-toggle">
+                                        <button class="lang-btn {{ 'active' if lang == 'ar' else '' }}" onclick="setLanguage('ar')">العربية</button>
+                                        <button class="lang-btn {{ 'active' if lang == 'en' else '' }}" onclick="setLanguage('en')">English</button>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="timezone">المنطقة الزمنية</span>
+                                        <span class="setting-desc" data-i18n="timezoneForDates">تحديد المنطقة الزمنية للتواريخ</span>
+                                    </div>
+                                    <select class="settings-select" id="timezoneSelect">
+                                        <option value="Asia/Riyadh">الرياض (GMT+3)</option>
+                                        <option value="Asia/Dubai">دبي (GMT+4)</option>
+                                        <option value="Africa/Cairo">القاهرة (GMT+2)</option>
+                                        <option value="Europe/London">لندن (GMT+0)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="appearance">المظهر</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="autoDarkMode">الوضع الداكن التلقائي</span>
+                                        <span class="setting-desc" data-i18n="autoDarkNight">تفعيل الوضع الداكن تلقائياً ليلاً</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="autoDarkMode">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="animations">تأثيرات الحركة</span>
+                                        <span class="setting-desc" data-i18n="enableAnimations">تفعيل الحركات والانتقالات</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="animationsEnabled" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Settings -->
+                        <div class="settings-tab" id="tab-ai">
+                            <h2 class="settings-tab-title" data-i18n="aiSettings">إعدادات الذكاء الاصطناعي</h2>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="baseModel">النموذج الأساسي</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="serviceProvider">مزود الخدمة</span>
+                                        <span class="setting-desc" data-i18n="chooseAIProvider">اختر مزود خدمة الذكاء الاصطناعي</span>
+                                    </div>
+                                    <select class="settings-select" id="aiProvider">
+                                        <option value="openai">OpenAI</option>
+                                        <option value="anthropic">Anthropic (Claude)</option>
+                                        <option value="google">Google (Gemini)</option>
+                                        <option value="mistral">Mistral AI</option>
+                                        <option value="groq">Groq</option>
+                                        <option value="local">نموذج محلي (Ollama)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="model">النموذج</span>
+                                        <span class="setting-desc" data-i18n="chooseAIModel">اختر نموذج الذكاء الاصطناعي</span>
+                                    </div>
+                                    <select class="settings-select" id="aiModelSelect">
+                                        <option value="gpt-4o">GPT-4o (الأحدث)</option>
+                                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                        <option value="gpt-4">GPT-4</option>
+                                        <option value="claude-3-opus">Claude 3 Opus</option>
+                                        <option value="claude-3-sonnet">Claude 3.5 Sonnet</option>
+                                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                                        <option value="gemini-pro">Gemini Pro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="generationCriteria">معايير التوليد</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="creativityLevel">درجة الإبداعية (Temperature)</span>
+                                        <span class="setting-desc" data-i18n="higherValuesCreative">قيمة أعلى = إجابات أكثر إبداعاً</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" class="settings-slider" id="temperatureSlider" min="0" max="100" value="70">
+                                        <span class="slider-value" id="temperatureValue">0.7</span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="maxTokens">الحد الأقصى للرموز</span>
+                                        <span class="setting-desc" data-i18n="responseLength">أقصى طول للرد</span>
+                                    </div>
+                                    <select class="settings-select" id="maxTokens">
+                                        <option value="1024">1,024 (قصير)</option>
+                                        <option value="2048" selected>2,048 (متوسط)</option>
+                                        <option value="4096">4,096 (طويل)</option>
+                                        <option value="8192">8,192 (طويل جداً)</option>
+                                        <option value="16384">16,384 (أقصى)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="topP">Top P (تنوع الكلمات)</span>
+                                        <span class="setting-desc" data-i18n="controlResponseDiversity">التحكم في تنوع الردود</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" class="settings-slider" id="topPSlider" min="0" max="100" value="90">
+                                        <span class="slider-value" id="topPValue">0.9</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="assistantPersonality">شخصية المساعد</h3>
+                                <div class="setting-item full-width">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="systemPrompt">تعليمات النظام (System Prompt)</span>
+                                        <span class="setting-desc" data-i18n="defineBehavior">حدد سلوك وشخصية المساعد</span>
+                                    </div>
+                                    <textarea class="settings-textarea" id="systemPrompt" placeholder="أنت مساعد ذكي ومفيد...">أنت مساعد ذكاء اصطناعي متقدم. تتحدث العربية بطلاقة وتقدم إجابات دقيقة ومفيدة.</textarea>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="expertMode">وضع الخبير</span>
+                                        <span class="setting-desc" data-i18n="detailedTechnical">ردود أكثر تفصيلاً وتقنية</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="expertMode">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chat Settings -->
+                        <div class="settings-tab" id="tab-chat">
+                            <h2 class="settings-tab-title" data-i18n="chatSettings">إعدادات المحادثة</h2>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="messageDisplay">عرض الرسائل</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="showTimestamps">عرض الوقت مع الرسائل</span>
+                                        <span class="setting-desc" data-i18n="displayMessageTime">إظهار وقت إرسال كل رسالة</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="showTimestamps" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="liveStreaming">البث المباشر للردود</span>
+                                        <span class="setting-desc" data-i18n="displayCharacterByCharacter">عرض الرد حرفاً تلو الآخر</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="streamResponses" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="markdownFormatting">تنسيق Markdown</span>
+                                        <span class="setting-desc" data-i18n="supportFormatting">دعم التنسيق في الرسائل</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="markdownEnabled" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="codeHighlighting">تمييز الكود</span>
+                                        <span class="setting-desc" data-i18n="colorCode">تلوين أكواد البرمجة</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="codeHighlight" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="historyMemory">السجل والذاكرة</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="autoSaveHistory">حفظ السجل تلقائياً</span>
+                                        <span class="setting-desc" data-i18n="saveConversations">حفظ المحادثات للرجوع إليها</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="autoSaveHistory" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="contextMemory">ذاكرة السياق</span>
+                                        <span class="setting-desc" data-i18n="savedMessages">عدد الرسائل المحفوظة في الذاكرة</span>
+                                    </div>
+                                    <select class="settings-select" id="contextMemory">
+                                        <option value="5">5 رسائل</option>
+                                        <option value="10" selected>10 رسائل</option>
+                                        <option value="20">20 رسالة</option>
+                                        <option value="50">50 رسالة</option>
+                                        <option value="0">بلا حدود</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="clearHistory">مسح السجل</span>
+                                        <span class="setting-desc" data-i18n="deleteSavedConversations">حذف جميع المحادثات المحفوظة</span>
+                                    </div>
+                                    <button class="settings-btn danger" onclick="clearAllHistory()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"/>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                        </svg>
+                                        <span data-i18n="clearAll">مسح الكل</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Voice Settings -->
+                        <div class="settings-tab" id="tab-voice">
+                            <h2 class="settings-tab-title" data-i18n="voiceSpeechSettings">إعدادات الصوت والنطق</h2>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="voiceInput">الإدخال الصوتي</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="enableVoiceInput">تفعيل الإدخال الصوتي</span>
+                                        <span class="setting-desc" data-i18n="speakInsteadWrite">التحدث بدلاً من الكتابة</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="voiceInputEnabled" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="speechLanguage">لغة التعرف الصوتي</span>
+                                        <span class="setting-desc" data-i18n="languageToText">لغة تحويل الصوت لنص</span>
+                                    </div>
+                                    <select class="settings-select" id="speechLang">
+                                        <option value="ar-SA">العربية (السعودية)</option>
+                                        <option value="ar-EG">العربية (مصر)</option>
+                                        <option value="ar-AE">العربية (الإمارات)</option>
+                                        <option value="en-US">English (US)</option>
+                                        <option value="en-GB">English (UK)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="autoSend">الإرسال التلقائي</span>
+                                        <span class="setting-desc" data-i18n="sendMessageAuto">إرسال الرسالة تلقائياً بعد التحدث</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="autoSendVoice">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="textToSpeech">النطق (Text-to-Speech)</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="readResponses">قراءة الردود صوتياً</span>
+                                        <span class="setting-desc" data-i18n="readAssistantResponses">نطق ردود المساعد</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="ttsEnabled">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="speechVoice">صوت النطق</span>
+                                        <span class="setting-desc" data-i18n="chooseReadingVoice">اختر صوت القراءة</span>
+                                    </div>
+                                    <select class="settings-select" id="ttsVoice">
+                                        <option value="default">الصوت الافتراضي</option>
+                                        <option value="female">صوت أنثوي</option>
+                                        <option value="male">صوت ذكوري</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="speechSpeed">سرعة النطق</span>
+                                        <span class="setting-desc" data-i18n="textReadingSpeed">سرعة قراءة النص</span>
+                                    </div>
+                                    <div class="slider-container">
+                                        <input type="range" class="settings-slider" id="ttsSpeed" min="50" max="200" value="100">
+                                        <span class="slider-value" id="ttsSpeedValue">1x</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Privacy Settings -->
+                        <div class="settings-tab" id="tab-privacy">
+                            <h2 class="settings-tab-title" data-i18n="privacySecurity">الخصوصية والأمان</h2>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="data">البيانات</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="shareAnalytics">مشاركة بيانات التحسين</span>
+                                        <span class="setting-desc" data-i18n="helpImproveService">المساعدة في تحسين الخدمة</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="shareAnalytics">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="endToEndEncryption">التشفير من طرف لطرف</span>
+                                        <span class="setting-desc" data-i18n="encryptConversations">تشفير المحادثات</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="e2eEncryption" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="deleteLocalData">حذف البيانات المحلية</span>
+                                        <span class="setting-desc" data-i18n="clearStoredData">مسح جميع البيانات المخزنة</span>
+                                    </div>
+                                    <button class="settings-btn danger" onclick="clearLocalData()">
+                                        <span data-i18n="deleteData">حذف البيانات</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="session">الجلسة</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="autoLogout">تسجيل الخروج التلقائي</span>
+                                        <span class="setting-desc" data-i18n="afterInactivity">بعد فترة من عدم النشاط</span>
+                                    </div>
+                                    <select class="settings-select" id="autoLogout">
+                                        <option value="0">معطل</option>
+                                        <option value="15">15 دقيقة</option>
+                                        <option value="30">30 دقيقة</option>
+                                        <option value="60">ساعة واحدة</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notifications Settings -->
+                        <div class="settings-tab" id="tab-notifications">
+                            <h2 class="settings-tab-title" data-i18n="notificationsSettings">إعدادات الإشعارات</h2>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="notifications">الإشعارات</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="enableNotifications">تفعيل الإشعارات</span>
+                                        <span class="setting-desc" data-i18n="receiveAppNotifications">تلقي إشعارات التطبيق</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="notificationsEnabled" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="notificationSound">صوت الإشعارات</span>
+                                        <span class="setting-desc" data-i18n="playSound">تشغيل صوت عند الإشعار</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="notificationSound" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="desktopNotifications">إشعارات سطح المكتب</span>
+                                        <span class="setting-desc" data-i18n="showBrowserNotifications">عرض إشعارات المتصفح</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="desktopNotifications">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Accessibility Settings -->
+                        <div class="settings-tab" id="tab-accessibility">
+                            <h2 class="settings-tab-title" data-i18n="accessibilitySettings">إمكانية الوصول</h2>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="display">العرض</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="fontSize">حجم الخط</span>
+                                        <span class="setting-desc" data-i18n="enlargeShrinkText">تكبير أو تصغير النص</span>
+                                    </div>
+                                    <select class="settings-select" id="fontSize">
+                                        <option value="small">صغير</option>
+                                        <option value="medium" selected>متوسط</option>
+                                        <option value="large">كبير</option>
+                                        <option value="xlarge">كبير جداً</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="highContrast">تباين عالي</span>
+                                        <span class="setting-desc" data-i18n="increaseColorClarity">زيادة وضوح الألوان</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="highContrast">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="reduceMotion">تقليل الحركة</span>
+                                        <span class="setting-desc" data-i18n="disableAnimations">تعطيل الحركات</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="reduceMotion">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="screenReader">قارئ الشاشة</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="screenReaderSupport">دعم قارئ الشاشة</span>
+                                        <span class="setting-desc" data-i18n="improveForVisuallyImpaired">تحسين للمستخدمين المكفوفين</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="screenReaderMode">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Advanced Settings -->
+                        <div class="settings-tab" id="tab-advanced">
+                            <h2 class="settings-tab-title" data-i18n="advancedSettings">الإعدادات المتقدمة</h2>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="apiConnection">API والاتصال</h3>
+                                <div class="setting-item full-width">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="apiKey">مفتاح API</span>
+                                        <span class="setting-desc" data-i18n="accessKey">مفتاح الوصول للخدمة</span>
+                                    </div>
+                                    <div class="api-key-input">
+                                        <input type="password" class="settings-input" id="apiKeyInput" placeholder="sk-...">
+                                        <button class="settings-btn" onclick="toggleApiKeyVisibility()">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="setting-item full-width">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="endpoint">نقطة النهاية (Endpoint)</span>
+                                        <span class="setting-desc" data-i18n="customAPIAddress">عنوان API المخصص</span>
+                                    </div>
+                                    <input type="text" class="settings-input" id="apiEndpoint" placeholder="https://api.openai.com/v1">
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="connectionTimeout">مهلة الاتصال</span>
+                                        <span class="setting-desc" data-i18n="maxWaitResponse">الحد الأقصى لانتظار الرد</span>
+                                    </div>
+                                    <select class="settings-select" id="connectionTimeout">
+                                        <option value="30">30 ثانية</option>
+                                        <option value="60" selected>60 ثانية</option>
+                                        <option value="120">120 ثانية</option>
+                                        <option value="300">5 دقائق</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-group">
+                                <h3 class="settings-group-title" data-i18n="developer">المطور</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="debugMode">وضع التصحيح</span>
+                                        <span class="setting-desc" data-i18n="showDevLogs">عرض سجلات التطوير</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="debugMode">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="exportSettings">تصدير الإعدادات</span>
+                                        <span class="setting-desc" data-i18n="saveAsFile">حفظ الإعدادات كملف</span>
+                                    </div>
+                                    <button class="settings-btn" onclick="exportSettings()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="7 10 12 15 17 10"/>
+                                            <line x1="12" y1="15" x2="12" y2="3"/>
+                                        </svg>
+                                        <span data-i18n="export">تصدير</span>
+                                    </button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="importSettings">استيراد الإعدادات</span>
+                                        <span class="setting-desc" data-i18n="loadFromFile">تحميل إعدادات من ملف</span>
+                                    </div>
+                                    <button class="settings-btn" onclick="importSettings()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="17 8 12 3 7 8"/>
+                                            <line x1="12" y1="3" x2="12" y2="15"/>
+                                        </svg>
+                                        <span data-i18n="import">استيراد</span>
+                                    </button>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span class="setting-label" data-i18n="reset">إعادة الضبط</span>
+                                        <span class="setting-desc" data-i18n="restoreDefaults">استعادة الإعدادات الافتراضية</span>
+                                    </div>
+                                    <button class="settings-btn danger" onclick="resetAllSettings()">
+                                        <span data-i18n="resetSettings">إعادة الضبط</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- About -->
+                        <div class="settings-tab" id="tab-about">
+                            <h2 class="settings-tab-title" data-i18n="aboutApp">حول التطبيق</h2>
+                            
+                            <div class="about-card">
+                                <div class="about-logo">
+                                    <div class="about-logo-icon">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+                                            <circle cx="7.5" cy="14.5" r="1.5"/>
+                                            <circle cx="16.5" cy="14.5" r="1.5"/>
+                                        </svg>
+                                    </div>
+                                    <div class="about-info">
+                                        <h3>AI Assistant</h3>
+                                        <span data-i18n="version">الإصدار</span> 2.0.0
+                                    </div>
+                                </div>
+                                <p class="about-desc">مساعد ذكاء اصطناعي متقدم مبني بأحدث تقنيات الذكاء الاصطناعي. يدعم نماذج متعددة ويوفر تجربة محادثة سلسة وذكية.</p>
+                                
+                                <div class="about-features">
+                                    <div class="about-feature">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                        <span data-i18n="multipleAIModels">دعم نماذج AI متعددة</span>
+                                    </div>
+                                    <div class="about-feature">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                        <span data-i18n="fullArabicInterface">واجهة عربية كاملة</span>
+                                    </div>
+                                    <div class="about-feature">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                        <span data-i18n="voiceInputOutput">إدخال صوتي ونطق</span>
+                                    </div>
+                                    <div class="about-feature">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                        <span data-i18n="encryptionDataProtection">تشفير وحماية البيانات</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="about-links">
+                                    <a href="#" class="about-link" data-i18n="privacyPolicy">سياسة الخصوصية</a>
+                                    <a href="#" class="about-link" data-i18n="termsOfUse">شروط الاستخدام</a>
+                                    <a href="#" class="about-link" data-i18n="help">المساعدة</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel Window -->
+            <div class="app-window" id="adminWindow" style="display: none;">
+                <div class="window-header">
+                    <div class="window-title">
+                        <div class="window-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <span data-i18n="controlPanel">لوحة التحكم</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="window-btn minimize" onclick="minimizeWindow('adminWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14"/>
+                            </svg>
+                        </button>
+                        <button class="window-btn maximize" onclick="toggleMaximize('adminWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            </svg>
+                        </button>
+                        <button class="window-btn close" onclick="closeWindow('adminWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <iframe src="/admin/theme" class="admin-iframe" id="adminIframe"></iframe>
+                </div>
+            </div>
+
+            <!-- Widgets Window (like macOS widgets) -->
+            <div class="app-window widget-window" id="widgetsWindow" style="display: none;">
+                <div class="window-header">
+                    <div class="window-title">
+                        <div class="window-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                            </svg>
+                        </div>
+                        <span data-i18n="widgets">الأدوات</span>
+                    </div>
+                    <div class="window-controls">
+                        <button class="window-btn close" onclick="closeWindow('widgetsWindow')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="window-content widgets-grid">
+                    <!-- Clock Widget -->
+                    <div class="widget clock-widget">
+                        <div class="widget-time" id="clockTime">12:00</div>
+                        <div class="widget-date" id="clockDate">الخميس، 5 ديسمبر</div>
+                    </div>
+                    
+                    <!-- Weather Widget -->
+                    <div class="widget weather-widget">
+                        <div class="weather-icon">🌤️</div>
+                        <div class="weather-temp">25°</div>
+                        <div class="weather-location">الرياض</div>
+                    </div>
+
+                    <!-- Quick Stats Widget -->
+                    <div class="widget stats-widget">
+                        <h4 data-i18n="todayStats">إحصائيات اليوم</h4>
+                        <div class="stat-item">
+                            <span data-i18n="conversations">المحادثات</span>
+                            <span class="stat-value">12</span>
+                        </div>
+                        <div class="stat-item">
+                            <span data-i18n="messages">الرسائل</span>
+                            <span class="stat-value">48</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <div class="taskbar-start">
+                <button class="taskbar-btn start-btn" onclick="toggleStartMenu()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="taskbar-center">
+                <button class="taskbar-btn app-btn" onclick="toggleWindow('chatWindow')" data-window="chatWindow" data-i18n-title="chatTitle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </button>
+                <button class="taskbar-btn app-btn" onclick="toggleWindow('widgetsWindow')" data-window="widgetsWindow" data-i18n-title="widgetsTitle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </button>
+                <button class="taskbar-btn app-btn" onclick="toggleWindow('settingsWindow')" data-window="settingsWindow" data-i18n-title="settingsTitle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
+                {% if user_role == 'admin' %}
+                <button class="taskbar-btn app-btn admin-btn" onclick="toggleWindow('adminWindow')" data-window="adminWindow" data-i18n-title="controlPanelTitle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </button>
+                {% endif %}
+            </div>
+
+            <div class="taskbar-end">
+                <div class="system-tray">
+                    <button class="tray-btn" onclick="toggleLanguage()">
+                        <span id="currentLang">{{ 'ع' if lang == 'ar' else 'EN' }}</span>
+                    </button>
+                    <div class="tray-time">
+                        <span id="taskbarTime">12:00</span>
+                        <span id="taskbarDate">5/12</span>
+                    </div>
+                </div>
+                <div class="user-menu">
+                    <button class="user-btn" onclick="toggleUserMenu()">
+                        <div class="user-avatar">{{ session.get('name', 'U')[0] }}</div>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-info">
+                            <div class="user-avatar large">{{ session.get('name', 'U')[0] }}</div>
+                            <div class="user-details">
+                                <span class="user-name">{{ session.get('name', 'مستخدم') }}</span>
+                                <span class="user-email">{{ session.get('username', '') }}</span>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="/logout" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16 17 21 12 16 7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                            <span data-i18n="logout">تسجيل الخروج</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Menu -->
+        <div class="start-menu" id="startMenu">
+            <div class="start-menu-header">
+                <input type="text" class="start-search" placeholder="ابحث..." data-i18n-placeholder="search">
+            </div>
+            <div class="start-menu-apps">
+                <div class="start-app" onclick="openWindow('chatWindow'); closeStartMenu();">
+                    <div class="start-app-icon chat-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </div>
+                    <span data-i18n="aiChat">الدردشة الذكية</span>
+                </div>
+                <div class="start-app" onclick="openWindow('widgetsWindow'); closeStartMenu();">
+                    <div class="start-app-icon widgets-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span data-i18n="widgets">الأدوات</span>
+                </div>
+                <div class="start-app" onclick="openWindow('settingsWindow'); closeStartMenu();">
+                    <div class="start-app-icon settings-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09"/>
+                        </svg>
+                    </div>
+                    <span data-i18n="settings">الإعدادات</span>
+                </div>
+                {% if user_role == 'admin' %}
+                <div class="start-app" onclick="openWindow('adminWindow'); closeStartMenu();">
+                    <div class="start-app-icon admin-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span data-i18n="controlPanel">لوحة التحكم</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="start-menu-footer">
+                <button class="power-btn" onclick="window.location.href='/logout'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+                        <line x1="12" y1="2" x2="12" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='translations.js') }}?v={{ timestamp }}"></script>
+    <script src="{{ url_for('static', filename='desktop.js') }}?v={{ timestamp }}"></script>
+</body>
+
+</html>

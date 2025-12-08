@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>تخصيص المظهر - لوحة التحكم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00A651;
+            --primary-dark: #008542;
+            --secondary: #1E88E5;
+            --bg-light: #F5F7FA;
+            --white: #FFFFFF;
+            --text-primary: #1A1D1F;
+            --text-secondary: #6F7782;
+            --border: #EFEFEF;
+            --danger: #FF4D4F;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .admin-sidebar {
+            width: 280px;
+            background: var(--white);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            padding: 24px;
+            flex: 1;
+        }
+
+        .menu-section {
+            margin-bottom: 24px;
+        }
+
+        .menu-section-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            padding-right: 12px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .menu-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .admin-sidebar-footer {
+            padding: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .admin-user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .admin-user-details {
+            flex: 1;
+        }
+
+        .admin-user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .admin-user-role {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            color: var(--danger);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #FFF1F0;
+            border-color: #FFA39E;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            margin-right: 280px;
+            padding: 32px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .admin-header-title h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .admin-header-title p {
+            color: var(--text-secondary);
+        }
+
+        .admin-header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: var(--bg-light);
+        }
+
+        .header-btn.primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .header-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .theme-container {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .settings-panel {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 24px;
+        }
+
+        .settings-section {
+            margin-bottom: 32px;
+        }
+
+        .settings-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .color-item {
+            margin-bottom: 12px;
+        }
+
+        .color-label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-light);
+        }
+
+        .color-input {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+
+        .color-hex {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .preview-panel {
+            position: sticky;
+            top: 32px;
+        }
+
+        .preview-frame {
+            background: white;
+            border-radius: 24px;
+            border: 8px solid #1A1D1F;
+            height: 700px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .preview-header {
+            background: #1A1D1F;
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .font-selector {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+
+        .logo-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .logo-type-selector {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .logo-preview-box {
+            width: 100%;
+            height: 100px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .background-preview-box {
+            width: 100%;
+            height: 120px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .background-preview-box:hover {
+            border-color: var(--primary);
+            background-color: var(--bg-light);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        @media (max-width: 1200px) {
+            .theme-container {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">DS</div>
+                <div class="sidebar-title">لوحة التحكم</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="menu-section">
+                    <h3 class="menu-section-title">الرئيسية</h3>
+                    <a href="/admin/dashboard" class="menu-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        <span>نظرة عامة</span>
+                    </a>
+                    <a href="/admin/users" class="menu-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        <span>المستخدمين</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <h3 class="menu-section-title">الإعدادات</h3>
+                    <a href="/admin/theme" class="menu-item active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2.69l5.74 5.88-5.74 5.88-5.74-5.88z" />
+                            <path
+                                d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
+                        </svg>
+                        <span>تخصيص المظهر</span>
+                    </a>
+                    <a href="/admin/widgets" class="menu-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                        <span>إدارة الودجات</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
+                        </svg>
+                        <span>الإعدادات العامة</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="admin-sidebar-footer">
+                <div class="admin-user-info">
+                    <div class="admin-user-avatar">{{ session.get('user_display_name', 'المدير')[0] }}</div>
+                    <div class="admin-user-details">
+                        <div class="admin-user-name">{{ session.get('user_display_name', 'المدير') }}</div>
+                        <div class="admin-user-role">مدير النظام</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    <span>تسجيل الخروج</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="admin-header-title">
+                    <h1>تخصيص المظهر</h1>
+                    <p>تحكم كامل في ألوان وهوبة التطبيق</p>
+                </div>
+                <div class="admin-header-actions">
+                    <button type="button" class="header-btn" id="resetBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                            <path d="M21 3v5h-5" />
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                            <path d="M3 21v-5h5" />
+                        </svg>
+                        <span>استعادة الافتراضي</span>
+                    </button>
+                    <button type="button" class="header-btn primary" id="saveBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                            <polyline points="17 21 17 13 7 13 7 21" />
+                            <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                        <span>حفظ التغييرات</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="theme-container">
+                <!-- Settings Panel -->
+                <div class="settings-panel">
+
+                    <!-- Logo Settings -->
+                    <div class="settings-section">
+                        <div class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 16l6-6 3 3 9-9" />
+                                <path d="M4 20h16" />
+                            </svg>
+                            الشعار (Logo)
+                        </div>
+                        
+                        <div class="logo-options">
+                            <div class="logo-type-selector">
+                                <label class="radio-label">
+                                    <input type="radio" name="logoType" value="text" onchange="toggleLogoType()">
+                                    نص (Text)
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="logoType" value="image" onchange="toggleLogoType()">
+                                    صورة (Image)
+                                </label>
+                            </div>
+
+                            <div id="logoTextParams" class="logo-params">
+                                <div class="input-group">
+                                    <label>نص الشعار</label>
+                                    <input type="text" id="logoText" class="text-input" oninput="updatePreview()"
+                                        placeholder="DS">
+                                </div>
+                            </div>
+
+                            <div id="logoImageParams" class="logo-params" style="display: none;">
+                                <div class="input-group">
+                                    <label>رفع صورة الشعار</label>
+                                    <input type="file" id="logoFile" accept="image/*" onchange="uploadLogo()">
+                                </div>
+                                <div id="logoPreview" class="logo-preview-box">
+                                    <span>لا توجد صورة</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Settings -->
+                    <div class="settings-section">
+                        <div class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                <polyline points="21 15 16 10 5 21" />
+                            </svg>
+                            خلفية المحادثة (Background)
+                        </div>
+                        <div class="background-options">
+                            <div class="logo-params">
+                                <div class="input-group">
+                                    <label>صورة الخلفية</label>
+                                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                                        <div class="background-preview-box" id="backgroundPreview"
+                                            onclick="document.getElementById('backgroundFile').click()"
+                                            style="cursor: pointer;">
+                                            <span>اضغط لرفع صورة</span>
+                                        </div>
+                                        <input type="file" id="backgroundFile" accept="image/*" style="display: none"
+                                            onchange="uploadBackground()">
+                                    </div>
+                                    <p style="font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem;">
+                                        يفضل استخدام صورة عالية الدقة (1920x1080)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand Colors -->
+                    <div class="settings-section">
+                        <div class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 8v8" />
+                                <path d="M8 12h8" />
+                            </svg>
+                            ألوان الهوية (Brand)
+                        </div>
+                        <div class="color-grid">
+                            <div class="color-item">
+                                <label class="color-label">اللون الأساسي</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="primary" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="primary-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">الأساسي (داكن)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="primary_dark" class="color-input"
+                                        onchange="updatePreview()">
+                                    <span class="color-hex" id="primary_dark-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">الأساسي (فاتح)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="primary_light" class="color-input"
+                                        onchange="updatePreview()">
+                                    <span class="color-hex" id="primary_light-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">اللون الثانوي</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="secondary" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="secondary-hex">#000000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Colors -->
+                    <div class="settings-section">
+                        <div class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2.69l5.74 5.88-5.74 5.88-5.74-5.88z" />
+                                <path
+                                    d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
+                            </svg>
+                            ألوان متقدمة (Advanced)
+                        </div>
+                        <div class="color-grid">
+                            <div class="color-item">
+                                <label class="color-label">خلفية القائمة (Sidebar)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="sidebar" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="sidebar-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">نص القائمة (Sidebar Text)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="sidebar_text" class="color-input"
+                                        onchange="updatePreview()">
+                                    <span class="color-hex" id="sidebar_text-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">خلفية التطبيق (App BG)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="background" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="background-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">النص الأساسي (Primary Text)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="text_primary" class="color-input"
+                                        onchange="updatePreview()">
+                                    <span class="color-hex" id="text_primary-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">النص الثانوي (Secondary Text)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="text_secondary" class="color-input"
+                                        onchange="updatePreview()">
+                                    <span class="color-hex" id="text_secondary-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">رسالة المستخدم (User Msg)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="user_msg_bg" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="user_msg_bg-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">رسالة البوت (Bot Msg)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="bot_msg_bg" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="bot_msg_bg-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">شعار الذكاء (AI Badge)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="ai_badge_bg" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="ai_badge_bg-hex">#000000</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">أيقونات الشريط السفلي (Taskbar Icons)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="taskbar_icons_color" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="taskbar_icons_color-hex">#FFFFFF</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">اسم التطبيق (App Title)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="app_title_color" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="app_title_color-hex">#FFFFFF</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Widget Colors -->
+                    <div class="settings-section">
+                        <div class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="14" width="7" height="7" rx="1"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            </svg>
+                            ألوان الـ Widgets
+                        </div>
+                        <div class="color-grid">
+                            <div class="color-item">
+                                <label class="color-label">خلفية Header Bar</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="header_bar_bg_color" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="header_bar_bg_color-hex">#19192D</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">خلفية Widget (Widget BG)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="widget_bg_color" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="widget_bg_color-hex">#1E1E32</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">حدود Widget (Widget Border)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="widget_border_color" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="widget_border_color-hex">#FFFFFF</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">عنوان Widget (Widget Title)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="widget_title_color" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="widget_title_color-hex">#FFFFFF</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">نص Widget (Widget Text)</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="widget_text_color" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="widget_text_color-hex">#CCCCCC</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">أيقونة AI Widget</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="widget_icon_ai" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="widget_icon_ai-hex">#667EEA</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">أيقونة Chat Widget</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="widget_icon_chat" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="widget_icon_chat-hex">#0078D4</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">أيقونة System Widget</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="widget_icon_system" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="widget_icon_system-hex">#00A651</span>
+                                </div>
+                            </div>
+                            <div class="color-item">
+                                <label class="color-label">أيقونة Actions Widget</label>
+                                <div class="color-input-wrapper">
+                                    <input type="color" id="widget_icon_actions" class="color-input" onchange="updatePreview()">
+                                    <span class="color-hex" id="widget_icon_actions-hex">#FF6B6B</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Font Settings -->
+                    <div class="settings-section">
+                        <div class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 7V4h16v3" />
+                                <path d="M9 20h6" />
+                                <path d="M12 4v16" />
+                            </svg>
+                            الخطوط (Typography)
+                        </div>
+                        <select id="font" class="font-selector" onchange="selectFont()">
+                            <option value="Cairo">Cairo (Arabic Standard)</option>
+                            <option value="Tajawal">Tajawal</option>
+                            <option value="Almarai">Almarai</option>
+                            <option value="IBM Plex Sans Arabic">IBM Plex Sans Arabic</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Live Preview -->
+                <div class="preview-panel">
+                    <div class="preview-frame">
+                        <div class="preview-header">
+                            <div style="display: flex; gap: 6px;">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: #FF5F57;"></div>
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: #FFBD2E;"></div>
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: #28C840;"></div>
+                            </div>
+                            <span>معاينة حية</span>
+                            <div></div>
+                        </div>
+                        <iframe src="/" class="preview-iframe" id="previewFrame"></iframe>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentTheme = {};
+
+        // Load theme settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
+            // Add event listeners for buttons
+            document.getElementById('saveBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Save button clicked');
+                saveTheme();
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Reset button clicked');
+                resetTheme();
+            });
+        });
+
+        async function loadTheme() {
+            try {
+                const response = await fetch('/api/theme/settings');
+                currentTheme = await response.json();
+
+                // Helper function to safely set element value
+                function setElementValue(id, value) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = value;
+                }
+
+                // Populate fields
+                setElementValue('primary', currentTheme.colors?.primary || '#00a651');
+                setElementValue('primary_dark', currentTheme.colors?.primary_dark || '#008542');
+                setElementValue('primary_light', currentTheme.colors?.primary_light || '#e8f5e9');
+                setElementValue('secondary', currentTheme.colors?.secondary || '#1e88e5');
+
+                // Advanced Colors
+                setElementValue('sidebar', currentTheme.colors?.sidebar || '#fafbfc');
+                setElementValue('sidebar_text', currentTheme.colors?.sidebar_text || '#1a1d1f');
+                setElementValue('background', currentTheme.colors?.background || '#f5f7fa');
+                setElementValue('text_primary', currentTheme.colors?.text_primary || '#1a1d1f');
+                setElementValue('text_secondary', currentTheme.colors?.text_secondary || '#6f7782');
+                setElementValue('user_msg_bg', currentTheme.colors?.user_msg_bg || '#f0f4f8');
+                setElementValue('bot_msg_bg', currentTheme.colors?.bot_msg_bg || '#ffffff');
+                setElementValue('ai_badge_bg', currentTheme.colors?.ai_badge_bg || '#00a651');
+                setElementValue('taskbar_icons_color', currentTheme.colors?.taskbar_icons_color || '#ffffff');
+                setElementValue('app_title_color', currentTheme.colors?.app_title_color || '#ffffff');
+                
+                // Widget Colors
+                setElementValue('header_bar_bg_color', currentTheme.colors?.header_bar_bg_color || '#19192d');
+                setElementValue('widget_bg_color', currentTheme.colors?.widget_bg_color || '#1e1e32');
+                setElementValue('widget_border_color', currentTheme.colors?.widget_border_color || '#ffffff');
+                setElementValue('widget_title_color', currentTheme.colors?.widget_title_color || '#ffffff');
+                setElementValue('widget_text_color', currentTheme.colors?.widget_text_color || '#cccccc');
+                setElementValue('widget_icon_ai', currentTheme.colors?.widget_icon_ai || '#667eea');
+                setElementValue('widget_icon_chat', currentTheme.colors?.widget_icon_chat || '#0078d4');
+                setElementValue('widget_icon_system', currentTheme.colors?.widget_icon_system || '#00a651');
+                setElementValue('widget_icon_actions', currentTheme.colors?.widget_icon_actions || '#ff6b6b');
+
+                // Update hex labels
+                updateHexLabels();
+
+                // Set Font
+                setElementValue('font', currentTheme.font || 'Cairo');
+
+                // Set Logo
+                const logoType = currentTheme.logo?.type || 'text';
+                const logoTypeRadio = document.querySelector(`input[name="logoType"][value="${logoType}"]`);
+                if (logoTypeRadio) {
+                    logoTypeRadio.checked = true;
+                    toggleLogoType();
+                }
+
+                if (logoType === 'text') {
+                    setElementValue('logoText', currentTheme.logo?.text || '');
+                } else if (currentTheme.logo?.url) {
+                    const logoPreview = document.getElementById('logoPreview');
+                    if (logoPreview) {
+                        logoPreview.style.backgroundImage = `url('${currentTheme.logo.url}')`;
+                        logoPreview.innerHTML = '';
+                    }
+                }
+
+                // Set Background
+                if (currentTheme.background_image) {
+                    const bgPreview = document.getElementById('backgroundPreview');
+                    if (bgPreview) {
+                        bgPreview.style.backgroundImage = `url('${currentTheme.background_image}')`;
+                        bgPreview.innerHTML = '';
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error loading theme:', error);
+            }
+        }
+
+        function updateHexLabels() {
+            document.querySelectorAll('.color-input').forEach(input => {
+                const hexId = input.id + '-hex';
+                const hexLabel = document.getElementById(hexId);
+                if (hexLabel) {
+                    hexLabel.textContent = input.value.toUpperCase();
+                }
+            });
+        }
+
+        function toggleLogoType() {
+            const logoTypeEl = document.querySelector('input[name="logoType"]:checked');
+            if (!logoTypeEl) return;
+            
+            const type = logoTypeEl.value;
+            const textParams = document.getElementById('logoTextParams');
+            const imageParams = document.getElementById('logoImageParams');
+            
+            if (type === 'text') {
+                if (textParams) textParams.style.display = 'block';
+                if (imageParams) imageParams.style.display = 'none';
+            } else {
+                if (textParams) textParams.style.display = 'none';
+                if (imageParams) imageParams.style.display = 'block';
+            }
+            updatePreview();
+        }
+
+        async function uploadLogo() {
+            const fileInput = document.getElementById('logoFile');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('logo', file);
+
+            try {
+                const response = await fetch('/api/theme/logo', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentTheme.logo.url = data.url;
+                    document.getElementById('logoPreview').style.backgroundImage = `url('${data.url}')`;
+                    document.getElementById('logoPreview').innerHTML = '';
+                    updatePreview();
+                }
+            } catch (error) {
+                console.error('Error uploading logo:', error);
+                alert('حدث خطأ أثناء رفع الشعار');
+            }
+        }
+
+        async function uploadBackground() {
+            const fileInput = document.getElementById('backgroundFile');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('background', file);
+
+            try {
+                const response = await fetch('/api/theme/background', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentTheme.background_image = data.url;
+                    document.getElementById('backgroundPreview').style.backgroundImage = `url('${data.url}')`;
+                    document.getElementById('backgroundPreview').innerHTML = '';
+                    updatePreview();
+                }
+            } catch (error) {
+                console.error('Error uploading background:', error);
+                alert('حدث خطأ أثناء رفع الخلفية');
+            }
+        }
+
+        function updatePreview() {
+            updateHexLabels();
+
+            // Collect current values safely
+            const primaryEl = document.getElementById('primary');
+            const primaryDarkEl = document.getElementById('primary_dark');
+            const primaryLightEl = document.getElementById('primary_light');
+            const secondaryEl = document.getElementById('secondary');
+            const fontEl = document.getElementById('font');
+            const logoTypeEl = document.querySelector('input[name="logoType"]:checked');
+            const logoTextEl = document.getElementById('logoText');
+            
+            const settings = {
+                colors: {
+                    primary: primaryEl ? primaryEl.value : '#00a651',
+                    primary_dark: primaryDarkEl ? primaryDarkEl.value : '#008542',
+                    primary_light: primaryLightEl ? primaryLightEl.value : '#e8f5e9',
+                    secondary: secondaryEl ? secondaryEl.value : '#1e88e5',
+                },
+                font: fontEl ? fontEl.value : 'Cairo',
+                logo: {
+                    type: logoTypeEl ? logoTypeEl.value : 'text',
+                    text: logoTextEl ? logoTextEl.value : '',
+                    url: currentTheme.logo ? currentTheme.logo.url : ''
+                },
+                background_image: currentTheme.background_image || ''
+            };
+
+            // Send to iframe
+            const iframe = document.getElementById('previewFrame');
+            // In a real implementation, we would use postMessage to update the iframe live
+            // For now, we rely on save/refresh for full effect, but we could implement live CSS injection
+        }
+
+        function selectFont() {
+            updatePreview();
+        }
+
+        async function saveTheme() {
+            console.log('saveTheme called');
+            
+            try {
+                const logoTypeEl = document.querySelector('input[name="logoType"]:checked');
+                const primaryEl = document.getElementById('primary');
+                const primaryDarkEl = document.getElementById('primary_dark');
+                const primaryLightEl = document.getElementById('primary_light');
+                const secondaryEl = document.getElementById('secondary');
+                const fontEl = document.getElementById('font');
+                const logoTextEl = document.getElementById('logoText');
+                
+                // Advanced colors
+                const sidebarEl = document.getElementById('sidebar');
+                const sidebarTextEl = document.getElementById('sidebar_text');
+                const backgroundEl = document.getElementById('background');
+                const textPrimaryEl = document.getElementById('text_primary');
+                const textSecondaryEl = document.getElementById('text_secondary');
+                const userMsgBgEl = document.getElementById('user_msg_bg');
+                const botMsgBgEl = document.getElementById('bot_msg_bg');
+                const aiBadgeBgEl = document.getElementById('ai_badge_bg');
+                const taskbarIconsColorEl = document.getElementById('taskbar_icons_color');
+                const appTitleColorEl = document.getElementById('app_title_color');
+                
+                // Widget colors
+                const headerBarBgColorEl = document.getElementById('header_bar_bg_color');
+                const widgetBgColorEl = document.getElementById('widget_bg_color');
+                const widgetBorderColorEl = document.getElementById('widget_border_color');
+                const widgetTitleColorEl = document.getElementById('widget_title_color');
+                const widgetTextColorEl = document.getElementById('widget_text_color');
+                const widgetIconAiEl = document.getElementById('widget_icon_ai');
+                const widgetIconChatEl = document.getElementById('widget_icon_chat');
+                const widgetIconSystemEl = document.getElementById('widget_icon_system');
+                const widgetIconActionsEl = document.getElementById('widget_icon_actions');
+                
+                const settings = {
+                    colors: {
+                        primary: primaryEl ? primaryEl.value : '#00a651',
+                        primary_dark: primaryDarkEl ? primaryDarkEl.value : '#008542',
+                        primary_light: primaryLightEl ? primaryLightEl.value : '#e8f5e9',
+                        secondary: secondaryEl ? secondaryEl.value : '#1e88e5',
+                        // Advanced colors - read from inputs
+                        background: backgroundEl ? backgroundEl.value : '#f5f7fa',
+                        sidebar: sidebarEl ? sidebarEl.value : '#fafbfc',
+                        sidebar_text: sidebarTextEl ? sidebarTextEl.value : '#6f7782',
+                        text_primary: textPrimaryEl ? textPrimaryEl.value : '#1a1d1f',
+                        text_secondary: textSecondaryEl ? textSecondaryEl.value : '#6f7782',
+                        user_msg_bg: userMsgBgEl ? userMsgBgEl.value : '#f0f4f8',
+                        bot_msg_bg: botMsgBgEl ? botMsgBgEl.value : '#ffffff',
+                        ai_badge_bg: aiBadgeBgEl ? aiBadgeBgEl.value : '#00a651',
+                        taskbar_icons_color: taskbarIconsColorEl ? taskbarIconsColorEl.value : '#ffffff',
+                        app_title_color: appTitleColorEl ? appTitleColorEl.value : '#ffffff',
+                        // Widget colors
+                        header_bar_bg_color: headerBarBgColorEl ? headerBarBgColorEl.value : '#19192d',
+                        widget_bg_color: widgetBgColorEl ? widgetBgColorEl.value : '#1e1e32',
+                        widget_border_color: widgetBorderColorEl ? widgetBorderColorEl.value : '#ffffff',
+                        widget_title_color: widgetTitleColorEl ? widgetTitleColorEl.value : '#ffffff',
+                        widget_text_color: widgetTextColorEl ? widgetTextColorEl.value : '#cccccc',
+                        widget_icon_ai: widgetIconAiEl ? widgetIconAiEl.value : '#667eea',
+                        widget_icon_chat: widgetIconChatEl ? widgetIconChatEl.value : '#0078d4',
+                        widget_icon_system: widgetIconSystemEl ? widgetIconSystemEl.value : '#00a651',
+                        widget_icon_actions: widgetIconActionsEl ? widgetIconActionsEl.value : '#ff6b6b'
+                    },
+                    font: fontEl ? fontEl.value : 'Cairo',
+                    logo: {
+                        type: logoTypeEl ? logoTypeEl.value : 'text',
+                        text: logoTextEl ? logoTextEl.value : '',
+                        url: currentTheme.logo ? currentTheme.logo.url : ''
+                    },
+                    background_image: currentTheme.background_image || ''
+                };
+                
+                console.log('settings:', settings);
+
+                const response = await fetch('/api/theme/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    alert('تم حفظ التغييرات بنجاح');
+                    document.getElementById('previewFrame').contentWindow.location.reload();
+                } else if (response.status === 401) {
+                    alert('يجب تسجيل الدخول أولاً');
+                    window.location.href = '/login';
+                } else if (response.status === 403) {
+                    alert('غير مصرح لك بالوصول');
+                } else {
+                    alert('حدث خطأ أثناء الحفظ: ' + (data.error || 'خطأ غير معروف'));
+                }
+            } catch (error) {
+                console.error('Error saving theme:', error);
+                alert('حدث خطأ أثناء الحفظ');
+            }
+        }
+
+        async function resetTheme() {
+            if (!confirm('هل أنت متأكد من استعادة الإعدادات الافتراضية؟')) return;
+
+            try {
+                const response = await fetch('/api/theme/reset', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Error resetting theme:', error);
+                alert('حدث خطأ أثناء الاستعادة');
+            }
+        }
+
+        function logout() {
+            window.location.href = '/logout';
+        }
+    </script>
+</body>
+
+</html>

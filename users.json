@@ -1,0 +1,17 @@
+{
+    "admin": {
+        "password": "admin",
+        "role": "admin",
+        "name": "المدير"
+    },
+    "user": {
+        "password": "user",
+        "role": "user",
+        "name": "مستخدم"
+    },
+    "Samir": {
+        "password": "mohamed",
+        "role": "admin",
+        "name": "Mohamed"
+    }
+}
