@@ -4,8 +4,8 @@
         "primary_dark": "#000000",
         "primary_light": "#000000",
         "secondary": "#1e88e5",
-        "background": "#ffffff",
-        "sidebar": "#ffffff",
+        "background": "#c19090",
+        "sidebar": "#cf9191",
         "sidebar_text": "#000000",
         "text_primary": "#000000",
         "text_secondary": "#000000",
@@ -28,7 +28,7 @@
     "logo": {
         "type": "image",
         "text": "",
-        "url": "/static/uploads/8cdae2663ec8e883_download_8.jpg"
+        "url": "/static/uploads/b198dd87b31e1438_logo_dark.png"
     },
     "background_image": "/static/uploads/7bfdc0256681ca10_pexels-photospublic-33041.jpg"
 }

@@ -1,16 +1,28 @@
 """
 LangGraph Agent Implementation with Real LLM Support
 """
+print('agent module is imported !!!')
 from langchain_openai import ChatOpenAI
 from langchain_core.language_models.fake import FakeStreamingListLLM
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.prebuilt import create_react_agent
 from typing import Generator, Optional
 import os
+from agentic_flow.scripts.vectara_app import generate_response as agent_generate
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+class CustomAgent:
+    def update_config(self, any):
+        pass
+    def generate_response(
+        self, 
+        message: str, 
+        session_key: str
+        ) -> Generator[str, None, None]:
+        for i in agent_generate(message, session_key):
+            yield i
 
 
 class ChatAgent:
@@ -145,4 +157,6 @@ class ChatAgent:
 
 
 # Global agent instance
-chat_agent = ChatAgent()
+# chat_agent = ChatAgent()
+
+chat_agent = CustomAgent()

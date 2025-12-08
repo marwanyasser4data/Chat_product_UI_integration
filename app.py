@@ -274,7 +274,8 @@ def chat():
         response = ""
         for chunk in chat_agent.generate_response(message, session_key):
             if chunk:
-                response = chunk
+                # Since its the chat endpoint not the stream-chat!
+                response += chunk
         
         if user_id:
             if current_session_id:
