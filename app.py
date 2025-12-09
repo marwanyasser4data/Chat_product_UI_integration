@@ -182,10 +182,8 @@ def admin_required(f):
 # Routes
 @app.route('/login')
 def login_page():
-    """Render login page"""
-    if 'username' in session:
-        return redirect(url_for('index'))
-    return render_template('login.html')
+    """Redirect to main page - auto-login enabled"""
+    return redirect(url_for('index'))
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -239,9 +237,15 @@ def set_language():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/')
-@login_required
 def index():
     """Render main desktop page"""
+    # Auto-login as admin for SaaS integration
+    if 'username' not in session:
+        session['username'] = 'admin'
+        session['role'] = 'admin'
+        session['user_display_name'] = 'Administrator'
+        session['language'] = 'ar'
+    
     if 'session_key' not in session:
         session['session_key'] = str(uuid.uuid4())
     
