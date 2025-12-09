@@ -243,7 +243,7 @@ def index():
         session['username'] = 'admin'
         session['role'] = 'admin'
         session['user_display_name'] = 'Administrator'
-        session['language'] = 'ar'
+        session['language'] = 'en'
     
     if 'session_key' not in session:
         session['session_key'] = str(uuid.uuid4())
@@ -255,7 +255,7 @@ def index():
     if user_id not in chat_sessions:
         chat_sessions[user_id] = []
     
-    lang = request.args.get('lang', session.get('language', 'ar'))
+    lang = request.args.get('lang', session.get('language', 'en'))
     session['language'] = lang
     
     theme = get_current_theme()
