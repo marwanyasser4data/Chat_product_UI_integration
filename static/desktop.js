@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
     renderChatHistory();
     updateWidgetStats();
     loadCustomWidgets();
+    
+    // Auto-create session if none exists (for SAS integration)
+    if (!currentSessionId) {
+        initializeDefaultSession();
+    }
 });
 
 // ============ Window Management ============
@@ -748,6 +753,28 @@ function hideTypingIndicator() {
 function generateSessionId() {
     currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     return currentSessionId;
+}
+
+// Initialize default session for SAS integration
+function initializeDefaultSession() {
+    if (!currentSessionId) {
+        currentSessionId = generateSessionId();
+        
+        // Create initial session
+        const initialSession = {
+            id: currentSessionId,
+            title: 'محادثة جديدة',
+            timestamp: Date.now(),
+            messages: []
+        };
+        
+        // Add to sessions array if not exists
+        if (!chatSessions.find(s => s.id === currentSessionId)) {
+            chatSessions.unshift(initialSession);
+            saveChatSessions();
+            renderChatHistory();
+        }
+    }
 }
 
 // ============ Utility Functions ============
