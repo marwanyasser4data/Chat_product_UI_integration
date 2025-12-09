@@ -32,8 +32,8 @@
     },
     "font": "Cairo",
     "app_name": {
-        "ar": "نموذج الذكاء الاصطناعي للبيانات",
-        "en": "DataScience LLM Chat Model"
+        "ar": "ALRAJHI BANK",
+        "en": "ALRAJHI BANK"
     },
     "chat_header_title": {
         "ar": "مساعد الذكاء الاصطناعي",
@@ -42,7 +42,7 @@
     "logo": {
         "type": "image",
         "text": "",
-        "url": ""
+        "url": "/static/uploads/Al-Rajhi.webp"
     },
     "background_image": "/static/uploads/633c412d64887309_abstract-design-background-smooth-flowing-lines.jpg"
 }
