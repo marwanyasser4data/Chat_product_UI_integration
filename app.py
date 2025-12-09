@@ -495,7 +495,6 @@ def get_theme():
     return jsonify({'theme': theme})
 
 @app.route('/change-language/<lang>', methods=['POST'])
-@login_required
 def change_language(lang):
     """Change interface language"""
     if lang in ['ar', 'en']:
@@ -1046,7 +1045,6 @@ def admin_widgets():
     return render_template('admin_widgets.html')
 
 @app.route('/api/widgets', methods=['GET'])
-@login_required
 def get_widgets():
     """Get all widgets - available to all logged in users"""
     widgets = load_widgets()
