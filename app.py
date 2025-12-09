@@ -223,7 +223,6 @@ def logout():
     return redirect(url_for('login_page'))
 
 @app.route('/set_language', methods=['POST'])
-@login_required
 def set_language():
     """Set user language preference"""
     try:
@@ -266,7 +265,6 @@ def index():
     return render_template('desktop.html', lang=lang, theme=theme, theme_settings=theme_settings, user_role=user_role, timestamp=int(datetime.now().timestamp()))
 
 @app.route('/chat', methods=['POST'])
-@login_required
 def chat():
     """Handle chat messages"""
     try:
@@ -330,7 +328,6 @@ def chat():
         return jsonify({'error': error_msg}), 500
 
 @app.route('/stream-chat', methods=['POST', 'GET'])
-@login_required
 def stream_chat():
     """Handle streaming chat messages"""
     try:
@@ -409,7 +406,6 @@ def stream_chat():
         return jsonify({'error': error_msg}), 500
 
 @app.route('/new-session', methods=['POST'])
-@login_required
 def new_session():
     """Create new chat session"""
     session['session_key'] = str(uuid.uuid4())
@@ -419,7 +415,6 @@ def new_session():
     })
 
 @app.route('/get-history', methods=['GET'])
-@login_required
 def get_history():
     """Get all chat sessions for current user"""
     user_id = session.get('user_id')
@@ -439,7 +434,7 @@ def get_history():
     return jsonify({'sessions': sessions_summary})
 
 @app.route('/get-session/<session_id>', methods=['GET'])
-@login_required
+@app.route('/get-session/<session_id>', methods=['GET'])
 def get_session(session_id):
     """Get full session data"""
     user_id = session.get('user_id')
@@ -453,7 +448,7 @@ def get_session(session_id):
     return jsonify({'error': 'Session not found'}), 404
 
 @app.route('/delete-session/<session_id>', methods=['DELETE'])
-@login_required
+@app.route('/delete-session/<session_id>', methods=['DELETE'])
 def delete_session(session_id):
     """Delete a chat session"""
     user_id = session.get('user_id')
@@ -468,7 +463,7 @@ def delete_session(session_id):
     return jsonify({'error': 'Session not found'}), 404
 
 @app.route('/clear-all-history', methods=['POST'])
-@login_required
+@app.route('/clear-history', methods=['POST'])
 def clear_all_history():
     """Clear all chat history for current user"""
     user_id = session.get('user_id')
