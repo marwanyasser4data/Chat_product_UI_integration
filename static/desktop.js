@@ -403,7 +403,6 @@ function newChat() {
     // Update history view
     renderChatHistory();
 }
-}
 
 // Save current session
 function saveCurrentSession() {
@@ -754,8 +753,7 @@ function hideTypingIndicator() {
 }
 
 function generateSessionId() {
-    currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    return currentSessionId;
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
 // ============ Utility Functions ============
