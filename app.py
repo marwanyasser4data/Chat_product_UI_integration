@@ -349,6 +349,7 @@ def stream_chat():
         
         session_key = session.get('session_key', str(uuid.uuid4()))
         session['session_key'] = session_key
+        user_id = session.get('user_id')
         
         full_response = []
         
@@ -358,19 +359,40 @@ def stream_chat():
                     full_response.append(chunk)
                     yield f"data: {chunk}\n\n"
             
-            # For SAS integration, sessions are managed on frontend (localStorage)
-            # Backend only streams responses
+            # Save to chat history after streaming completes
+            if user_id:
+                complete_response = ''.join(full_response)
+                if current_session_id:
+                    for chat_session in chat_sessions.get(user_id, []):
+                        if chat_session['id'] == current_session_id:
+                            chat_session['messages'].append({
+                                'user': message,
+                                'bot': complete_response,
+                                'timestamp': datetime.now().isoformat()
+                            })
+                            chat_session['updated_at'] = datetime.now().isoformat()
+                            chat_session['title'] = message[:50] + ('...' if len(message) > 50 else '')
+                            break
+                else:
+                    new_session = {
+                        'id': str(uuid.uuid4()),
+                        'title': message[:50] + ('...' if len(message) > 50 else ''),
+                        'created_at': datetime.now().isoformat(),
+                        'updated_at': datetime.now().isoformat(),
+                        'messages': [{
+                            'user': message,
+                            'bot': complete_response,
+                            'timestamp': datetime.now().isoformat()
+                        }]
+                    }
+                    if user_id not in chat_sessions:
+                        chat_sessions[user_id] = []
+                    chat_sessions[user_id].insert(0, new_session)
             
             yield "event: end\ndata: complete\n\n"
         
         return Response(
             stream_with_context(generate()),
-            mimetype='text/event-stream',
-            headers={
-                'Cache-Control': 'no-cache',
-                'X-Accel-Buffering': 'no'
-            }
-        )
             mimetype='text/event-stream',
             headers={
                 'Cache-Control': 'no-cache',

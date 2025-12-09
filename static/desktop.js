@@ -383,9 +383,11 @@ function newChat() {
         saveCurrentSession();
     }
     
-    // Reset state - don't create session until first message
+    // Reset state - session will be created on first message
     conversationHistory = [];
     currentSessionId = null;
+    
+    renderChatHistory();
     
     const messagesContainer = document.getElementById('chatMessages');
     const welcomeScreen = document.getElementById('welcomeScreen');
@@ -399,22 +401,13 @@ function newChat() {
     
     const input = document.getElementById('messageInput');
     if (input) input.value = '';
-    
-    // Update history view
-    renderChatHistory();
 }
 
 // Save current session
 function saveCurrentSession() {
-    if (!currentSessionId) {
-        console.warn('Cannot save session: currentSessionId is null');
-        return;
-    }
-    
     const session = chatSessions.find(s => s.id === currentSessionId);
     if (session) {
         session.messages = conversationHistory;
-        session.timestamp = Date.now();
         if (conversationHistory.length > 0) {
             // Use first user message as title
             const firstUserMsg = conversationHistory.find(m => m.type === 'user');
@@ -424,9 +417,6 @@ function saveCurrentSession() {
         }
         saveChatSessions();
         renderChatHistory();
-        console.log('Session saved:', currentSessionId, 'Messages:', conversationHistory.length);
-    } else {
-        console.warn('Session not found:', currentSessionId);
     }
 }
 
@@ -488,21 +478,18 @@ function sendMessage() {
     
     if (!message) return;
     
-    // Create new session if none exists
+    // Create a new session if one doesn't exist (first message)
     if (!currentSessionId) {
         currentSessionId = generateSessionId();
         const newSession = {
             id: currentSessionId,
             title: message.substring(0, 30) + (message.length > 30 ? '...' : ''),
-            messages: [],
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            messages: []
         };
         chatSessions.unshift(newSession);
         saveChatSessions();
         renderChatHistory();
-        console.log('Created new session:', currentSessionId);
-    } else {
-        console.log('Using existing session:', currentSessionId);
     }
     
     // Hide welcome screen
@@ -513,7 +500,6 @@ function sendMessage() {
     
     // Add user message to history first
     conversationHistory.push({ text: message, type: 'user', timestamp: Date.now() });
-    console.log('Conversation history length:', conversationHistory.length);
     
     // Add user message to DOM
     addMessageToDOM(message, 'user');
@@ -529,7 +515,7 @@ function sendMessage() {
     // Always use streaming for real-time response
     const url = '/stream-chat?' + new URLSearchParams({
         message: message,
-        current_session_id: currentSessionId
+        current_session_id: currentSessionId || ''
     });
     
     const eventSource = new EventSource(url);
@@ -766,7 +752,8 @@ function hideTypingIndicator() {
 }
 
 function generateSessionId() {
-    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return currentSessionId;
 }
 
 // ============ Utility Functions ============
