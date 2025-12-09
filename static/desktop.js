@@ -406,9 +406,15 @@ function newChat() {
 
 // Save current session
 function saveCurrentSession() {
+    if (!currentSessionId) {
+        console.warn('Cannot save session: currentSessionId is null');
+        return;
+    }
+    
     const session = chatSessions.find(s => s.id === currentSessionId);
     if (session) {
         session.messages = conversationHistory;
+        session.timestamp = Date.now();
         if (conversationHistory.length > 0) {
             // Use first user message as title
             const firstUserMsg = conversationHistory.find(m => m.type === 'user');
@@ -418,6 +424,9 @@ function saveCurrentSession() {
         }
         saveChatSessions();
         renderChatHistory();
+        console.log('Session saved:', currentSessionId, 'Messages:', conversationHistory.length);
+    } else {
+        console.warn('Session not found:', currentSessionId);
     }
 }
 
@@ -491,6 +500,9 @@ function sendMessage() {
         chatSessions.unshift(newSession);
         saveChatSessions();
         renderChatHistory();
+        console.log('Created new session:', currentSessionId);
+    } else {
+        console.log('Using existing session:', currentSessionId);
     }
     
     // Hide welcome screen
@@ -501,6 +513,7 @@ function sendMessage() {
     
     // Add user message to history first
     conversationHistory.push({ text: message, type: 'user', timestamp: Date.now() });
+    console.log('Conversation history length:', conversationHistory.length);
     
     // Add user message to DOM
     addMessageToDOM(message, 'user');
