@@ -514,9 +514,10 @@ function sendMessage() {
     
     // Always use streaming for real-time response
     const url = '/stream-chat?' + new URLSearchParams({
-        message: message,
-        current_session_id: currentSessionId || ''
+        message: message
     });
+    
+    console.log('[Chat] Sending message to session:', currentSessionId);
     
     const eventSource = new EventSource(url);
     activeEventSource = eventSource;
