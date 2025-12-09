@@ -383,19 +383,9 @@ function newChat() {
         saveCurrentSession();
     }
     
+    // Reset state - don't create session until first message
     conversationHistory = [];
-    currentSessionId = generateSessionId();
-    
-    // Create new session
-    const newSession = {
-        id: currentSessionId,
-        title: 'محادثة جديدة',
-        timestamp: Date.now(),
-        messages: []
-    };
-    chatSessions.unshift(newSession);
-    saveChatSessions();
-    renderChatHistory();
+    currentSessionId = null;
     
     const messagesContainer = document.getElementById('chatMessages');
     const welcomeScreen = document.getElementById('welcomeScreen');
@@ -409,6 +399,10 @@ function newChat() {
     
     const input = document.getElementById('messageInput');
     if (input) input.value = '';
+    
+    // Update history view
+    renderChatHistory();
+}
 }
 
 // Save current session
@@ -486,6 +480,20 @@ function sendMessage() {
     
     if (!message) return;
     
+    // Create new session if none exists
+    if (!currentSessionId) {
+        currentSessionId = generateSessionId();
+        const newSession = {
+            id: currentSessionId,
+            title: message.substring(0, 30) + (message.length > 30 ? '...' : ''),
+            messages: [],
+            timestamp: Date.now()
+        };
+        chatSessions.unshift(newSession);
+        saveChatSessions();
+        renderChatHistory();
+    }
+    
     // Hide welcome screen
     const welcomeScreen = document.getElementById('welcomeScreen');
     if (welcomeScreen) {
@@ -509,7 +517,7 @@ function sendMessage() {
     // Always use streaming for real-time response
     const url = '/stream-chat?' + new URLSearchParams({
         message: message,
-        current_session_id: currentSessionId || ''
+        current_session_id: currentSessionId
     });
     
     const eventSource = new EventSource(url);
