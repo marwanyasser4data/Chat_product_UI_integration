@@ -542,6 +542,53 @@
                 <!-- Settings Panel -->
                 <div class="settings-panel">
 
+                    <!-- App Name Settings -->
+                    <div class="settings-section">
+                        <div class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 7h16M4 12h16M4 17h10" />
+                            </svg>
+                            اسم التطبيق (App Name)
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>اسم التطبيق - عربي (الصفحة الرئيسية)</label>
+                            <input type="text" id="appNameAr" class="text-input" oninput="updatePreview()"
+                                placeholder="نموذج الذكاء الاصطناعي للبيانات" value="نموذج الذكاء الاصطناعي للبيانات">
+                            <small style="color: #888; display: block; margin-top: 5px;">
+                                سيظهر في أعلى الصفحة عند اختيار اللغة العربية
+                            </small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>اسم التطبيق - English (الصفحة الرئيسية)</label>
+                            <input type="text" id="appNameEn" class="text-input" oninput="updatePreview()"
+                                placeholder="DataScience LLM Chat Model" value="DataScience LLM Chat Model">
+                            <small style="color: #888; display: block; margin-top: 5px;">
+                                Will appear at the top when English is selected
+                            </small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>عنوان الشات - عربي (Chat Header)</label>
+                            <input type="text" id="chatHeaderTitleAr" class="text-input" oninput="updatePreview()"
+                                placeholder="مساعد الذكاء الاصطناعي" value="مساعد الذكاء الاصطناعي">
+                            <small style="color: #888; display: block; margin-top: 5px;">
+                                سيظهر في أعلى شاشة الشات عند اختيار اللغة العربية
+                            </small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>عنوان الشات - English (Chat Header)</label>
+                            <input type="text" id="chatHeaderTitleEn" class="text-input" oninput="updatePreview()"
+                                placeholder="AI Assistant" value="AI Assistant">
+                            <small style="color: #888; display: block; margin-top: 5px;">
+                                Will appear at the top of chat when English is selected
+                            </small>
+                        </div>
+                    </div>
+
                     <!-- Logo Settings -->
                     <div class="settings-section">
                         <div class="section-title">
@@ -828,6 +875,55 @@
                         </div>
                     </div>
 
+                    <!-- Transparency Settings -->
+                    <div class="settings-section">
+                        <div class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" opacity="0.5"/>
+                                <path d="M3 3L21 21" stroke-dasharray="2 2"/>
+                            </svg>
+                            الشفافية (Transparency)
+                        </div>
+                        <div class="transparency-controls">
+                            <div class="input-group">
+                                <label for="sidebar_opacity">شفافية القائمة الجانبية (Sidebar)</label>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <input type="range" id="sidebar_opacity" min="0" max="100" value="100" 
+                                           oninput="updateOpacity('sidebar', this.value)" 
+                                           style="flex: 1; accent-color: var(--primary);">
+                                    <span id="sidebar_opacity_value" style="min-width: 45px; font-weight: 600;">100%</span>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="background_opacity">شفافية الخلفية (Background)</label>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <input type="range" id="background_opacity" min="0" max="100" value="100" 
+                                           oninput="updateOpacity('background', this.value)" 
+                                           style="flex: 1; accent-color: var(--primary);">
+                                    <span id="background_opacity_value" style="min-width: 45px; font-weight: 600;">100%</span>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="widget_opacity">شفافية الـ Widgets</label>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <input type="range" id="widget_opacity" min="0" max="100" value="100" 
+                                           oninput="updateOpacity('widget', this.value)" 
+                                           style="flex: 1; accent-color: var(--primary);">
+                                    <span id="widget_opacity_value" style="min-width: 45px; font-weight: 600;">100%</span>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="chat_msg_opacity">شفافية رسائل الشات</label>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <input type="range" id="chat_msg_opacity" min="0" max="100" value="100" 
+                                           oninput="updateOpacity('chat_msg', this.value)" 
+                                           style="flex: 1; accent-color: var(--primary);">
+                                    <span id="chat_msg_opacity_value" style="min-width: 45px; font-weight: 600;">100%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Font Settings -->
                     <div class="settings-section">
                         <div class="section-title">
@@ -929,11 +1025,29 @@
                 setElementValue('widget_icon_system', currentTheme.colors?.widget_icon_system || '#00a651');
                 setElementValue('widget_icon_actions', currentTheme.colors?.widget_icon_actions || '#ff6b6b');
 
+                // Load Opacity/Transparency values
+                setElementValue('sidebar_opacity', currentTheme.opacity?.sidebar ?? 100);
+                setElementValue('background_opacity', currentTheme.opacity?.background ?? 100);
+                setElementValue('widget_opacity', currentTheme.opacity?.widget ?? 100);
+                setElementValue('chat_msg_opacity', currentTheme.opacity?.chat_msg ?? 100);
+                
+                // Update opacity display values
+                updateOpacityDisplay('sidebar', currentTheme.opacity?.sidebar ?? 100);
+                updateOpacityDisplay('background', currentTheme.opacity?.background ?? 100);
+                updateOpacityDisplay('widget', currentTheme.opacity?.widget ?? 100);
+                updateOpacityDisplay('chat_msg', currentTheme.opacity?.chat_msg ?? 100);
+
                 // Update hex labels
                 updateHexLabels();
 
                 // Set Font
                 setElementValue('font', currentTheme.font || 'Cairo');
+
+                // Set App Names (bilingual)
+                setElementValue('appNameAr', currentTheme.app_name?.ar || 'نموذج الذكاء الاصطناعي للبيانات');
+                setElementValue('appNameEn', currentTheme.app_name?.en || 'DataScience LLM Chat Model');
+                setElementValue('chatHeaderTitleAr', currentTheme.chat_header_title?.ar || 'مساعد الذكاء الاصطناعي');
+                setElementValue('chatHeaderTitleEn', currentTheme.chat_header_title?.en || 'AI Assistant');
 
                 // Set Logo
                 const logoType = currentTheme.logo?.type || 'text';
@@ -1087,6 +1201,18 @@
             updatePreview();
         }
 
+        function updateOpacity(type, value) {
+            updateOpacityDisplay(type, value);
+            updatePreview();
+        }
+
+        function updateOpacityDisplay(type, value) {
+            const displayEl = document.getElementById(`${type}_opacity_value`);
+            if (displayEl) {
+                displayEl.textContent = value + '%';
+            }
+        }
+
         async function saveTheme() {
             console.log('saveTheme called');
             
@@ -1098,6 +1224,10 @@
                 const secondaryEl = document.getElementById('secondary');
                 const fontEl = document.getElementById('font');
                 const logoTextEl = document.getElementById('logoText');
+                const appNameArEl = document.getElementById('appNameAr');
+                const appNameEnEl = document.getElementById('appNameEn');
+                const chatHeaderTitleArEl = document.getElementById('chatHeaderTitleAr');
+                const chatHeaderTitleEnEl = document.getElementById('chatHeaderTitleEn');
                 
                 // Advanced colors
                 const sidebarEl = document.getElementById('sidebar');
@@ -1121,6 +1251,12 @@
                 const widgetIconChatEl = document.getElementById('widget_icon_chat');
                 const widgetIconSystemEl = document.getElementById('widget_icon_system');
                 const widgetIconActionsEl = document.getElementById('widget_icon_actions');
+                
+                // Opacity/Transparency elements
+                const sidebarOpacityEl = document.getElementById('sidebar_opacity');
+                const backgroundOpacityEl = document.getElementById('background_opacity');
+                const widgetOpacityEl = document.getElementById('widget_opacity');
+                const chatMsgOpacityEl = document.getElementById('chat_msg_opacity');
                 
                 const settings = {
                     colors: {
@@ -1150,7 +1286,21 @@
                         widget_icon_system: widgetIconSystemEl ? widgetIconSystemEl.value : '#00a651',
                         widget_icon_actions: widgetIconActionsEl ? widgetIconActionsEl.value : '#ff6b6b'
                     },
+                    opacity: {
+                        sidebar: sidebarOpacityEl ? parseInt(sidebarOpacityEl.value) : 100,
+                        background: backgroundOpacityEl ? parseInt(backgroundOpacityEl.value) : 100,
+                        widget: widgetOpacityEl ? parseInt(widgetOpacityEl.value) : 100,
+                        chat_msg: chatMsgOpacityEl ? parseInt(chatMsgOpacityEl.value) : 100
+                    },
                     font: fontEl ? fontEl.value : 'Cairo',
+                    app_name: {
+                        ar: appNameArEl ? appNameArEl.value : 'نموذج الذكاء الاصطناعي للبيانات',
+                        en: appNameEnEl ? appNameEnEl.value : 'DataScience LLM Chat Model'
+                    },
+                    chat_header_title: {
+                        ar: chatHeaderTitleArEl ? chatHeaderTitleArEl.value : 'مساعد الذكاء الاصطناعي',
+                        en: chatHeaderTitleEnEl ? chatHeaderTitleEnEl.value : 'AI Assistant'
+                    },
                     logo: {
                         type: logoTypeEl ? logoTypeEl.value : 'text',
                         text: logoTextEl ? logoTextEl.value : '',

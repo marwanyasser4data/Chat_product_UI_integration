@@ -20,13 +20,15 @@ if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
     '''
         Configuring ngrok tunnel
     '''
-    print('before start ngrok in my app')
-    port = real_estate_mcp.port
-    tunnel = ngrok.connect(port, 'http')
-    print(f'ngrok tunnel url: {tunnel.public_url}')
-    print('after strating ngrok in my app')
-
-    print("Ngrok URL:", tunnel.public_url)
+    if real_estate_mcp is not None:
+        print('before start ngrok in my app')
+        port = real_estate_mcp.port
+        tunnel = ngrok.connect(port, 'http')
+        print(f'ngrok tunnel url: {tunnel.public_url}')
+        print('after strating ngrok in my app')
+        print("Ngrok URL:", tunnel.public_url)
+    else:
+        print("MCP server not available, continuing without it...")
 else:
     print("Skipping ngrok on auto-reloader process")
 

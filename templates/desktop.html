@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ theme_settings.app_name or 'AI Assistant' }}</title>
+    <title>{{ theme_settings.app_name[lang] if theme_settings.app_name is mapping else theme_settings.app_name or 'AI Assistant' }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='desktop.css') }}?v={{ timestamp }}">
     <link rel="stylesheet" href="/custom-theme.css?v={{ timestamp }}">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
                     </svg>
                 </div>
                 {% endif %}
-                <span class="header-title">DataScience LLM Chat Model</span>
+                <span class="header-title" id="mainAppTitle">{{ theme_settings.app_name.ar if theme_settings.app_name is mapping else theme_settings.app_name or 'نموذج الذكاء الاصطناعي للبيانات' }}</span>
             </div>
             <div class="header-right">
                 <div class="header-status">
@@ -218,7 +218,7 @@
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                             </svg>
                         </div>
-                        <span data-i18n="aiAssistant">مساعد الذكاء الاصطناعي</span>
+                        <span id="chatWindowTitle">{{ theme_settings.app_name[lang] if theme_settings.app_name is mapping else theme_settings.app_name or 'نموذج الذكاء الاصطناعي للبيانات' }}</span>
                     </div>
                     <div class="window-controls">
                         <button class="window-btn minimize" onclick="minimizeWindow('chatWindow')">
@@ -278,11 +278,11 @@
                                     <div class="ai-avatar-mini">AI</div>
                                 </div>
                                 <div class="chat-title-info">
-                                    <h2 data-i18n="aiAssistant">مساعد الذكاء الاصطناعي</h2>
+                                    <h2 id="chatAppTitle">{{ theme_settings.chat_header_title.ar if theme_settings.chat_header_title is mapping else theme_settings.chat_header_title or 'مساعد الذكاء الاصطناعي' }}</h2>
                                     <div class="chat-status-bar">
                                         <span class="status-indicator online"></span>
                                         <span class="status-text" id="chatStatusText" data-i18n="readyToHelp">جاهز للمساعدة</span>
-                                        <span class="model-tag" id="currentModelTag">GPT-4o</span>
+                                        <span class="model-tag" id="currentModelTag">Datascience LLM Model</span>
                                     </div>
                                 </div>
                             </div>
@@ -330,32 +330,8 @@
                         <!-- Chat Messages Area -->
                         <div class="chat-messages" id="chatMessages">
                             <div class="welcome-screen" id="welcomeScreen">
-                                <div class="ai-avatar">
-                                    <div class="moon-container">
-                                        <!-- Stars -->
-                                        <div class="moon-stars">
-                                            <div class="star star-1"></div>
-                                            <div class="star star-2"></div>
-                                            <div class="star star-3"></div>
-                                            <div class="star star-4"></div>
-                                            <div class="star star-5"></div>
-                                        </div>
-                                        
-                                        <!-- Moon -->
-                                        <div class="avatar-orb">
-                                            <span>AI</span>
-                                        </div>
-                                        
-                                        <!-- Clouds -->
-                                        <div class="clouds-container">
-                                            <div class="cloud cloud-1"></div>
-                                            <div class="cloud cloud-2"></div>
-                                            <div class="cloud cloud-3"></div>
-                                            <div class="cloud cloud-4"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <h2 class="app-title">DataScience LLM AI Chat</h2>
+                               
+                                <h2 class="app-title" id="welcomeAppTitle">{{ theme_settings.app_name[lang] if theme_settings.app_name is mapping else theme_settings.app_name or 'نموذج الذكاء الاصطناعي للبيانات' }}</h2>
                                 <p class="welcome-subtitle" data-i18n="welcomeMessage">مرحباً! كيف يمكنني مساعدتك اليوم؟</p>
                                 
                                 <!-- Quick Capabilities -->
@@ -480,10 +456,13 @@
                                             <span></span><span></span><span></span><span></span>
                                         </div>
                                     </button>
-                                    <button class="send-btn-modern" onclick="sendMessage()" id="sendBtn">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <button class="send-btn-modern" onclick="handleSendButton()" id="sendBtn">
+                                        <svg id="sendIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="22" y1="2" x2="11" y2="13"/>
                                             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                        </svg>
+                                        <svg id="stopIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                                            <rect x="6" y="6" width="12" height="12" rx="2"/>
                                         </svg>
                                     </button>
                                 </div>
@@ -1453,6 +1432,55 @@
 
     <script src="{{ url_for('static', filename='translations.js') }}?v={{ timestamp }}"></script>
     <script src="{{ url_for('static', filename='desktop.js') }}?v={{ timestamp }}"></script>
+    <script>
+        // Dynamic titles based on language
+        const appTitles = {{ theme_settings.app_name|tojson }};
+        const chatTitles = {{ theme_settings.chat_header_title|tojson }};
+        
+        // Update titles when language changes
+        function updateDynamicTitles(lang) {
+            const mainTitle = document.getElementById('mainAppTitle');
+            const chatTitle = document.getElementById('chatAppTitle');
+            const chatWindowTitle = document.getElementById('chatWindowTitle');
+            const welcomeAppTitle = document.getElementById('welcomeAppTitle');
+            const pageTitle = document.querySelector('title');
+            
+            if (mainTitle && appTitles && typeof appTitles === 'object') {
+                mainTitle.textContent = appTitles[lang] || appTitles.ar || 'نموذج الذكاء الاصطناعي للبيانات';
+            }
+            
+            if (chatWindowTitle && appTitles && typeof appTitles === 'object') {
+                chatWindowTitle.textContent = appTitles[lang] || appTitles.ar || 'نموذج الذكاء الاصطناعي للبيانات';
+            }
+            
+            if (welcomeAppTitle && appTitles && typeof appTitles === 'object') {
+                welcomeAppTitle.textContent = appTitles[lang] || appTitles.ar || 'نموذج الذكاء الاصطناعي للبيانات';
+            }
+            
+            if (pageTitle && appTitles && typeof appTitles === 'object') {
+                pageTitle.textContent = appTitles[lang] || appTitles.ar || 'نموذج الذكاء الاصطناعي للبيانات';
+            }
+            
+            if (chatTitle && chatTitles && typeof chatTitles === 'object') {
+                chatTitle.textContent = chatTitles[lang] || chatTitles.ar || 'مساعد الذكاء الاصطناعي';
+            }
+        }
+        
+        // Call on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentLang = document.documentElement.lang || 'ar';
+            updateDynamicTitles(currentLang);
+        });
+        
+        // Override setLanguage to update titles before reload
+        const originalSetLanguage = window.setLanguage;
+        if (originalSetLanguage) {
+            window.setLanguage = function(lang) {
+                updateDynamicTitles(lang);
+                originalSetLanguage(lang);
+            };
+        }
+    </script>
 </body>
 
 </html>

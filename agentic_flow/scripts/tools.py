@@ -517,16 +517,33 @@ class VectaraAPIs:
             response = requests.post(url, headers=headers, data=json.dumps(payload,ensure_ascii=False), stream=True)
         print(f'Here is the payload: {payload}')
         print("response:       ",response)
+        print(f"Response status code: {response.status_code}")
+        print(f"Response headers: {dict(response.headers)}")
         # Streaming mode
         try:
+            line_count = 0
+            has_error = False
             for line in response.iter_lines(decode_unicode=False):
                 line = line.decode('utf-8')
-                # print(line)
+                line_count += 1
+                print(f"Line {line_count}: {line[:100]}")  # Print first 100 chars
+                
+                # Check for error events
+                if line.startswith("event:error"):
+                    has_error = True
+                    continue
                 if line.startswith("data:"):
                     json_str = line[5:].strip()  # Remove "data:" prefix
                     if json_str:  # Skip empty data lines
                         try:
                             data = json.loads(json_str)
+                            # If this is an error message, yield it as content
+                            if has_error and data.get('type') == 'error':
+                                error_msgs = data.get('messages', [])
+                                error_text = ' - '.join(error_msgs) if error_msgs else 'Unknown error'
+                                yield {'content': f'خطأ: {error_text}'}
+                                has_error = False
+                                continue
                             yield data
                         except json.JSONDecodeError as e:
                             print(f"Parse error: {e}, Line: {json_str}")

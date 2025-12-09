@@ -320,6 +320,10 @@ let conversationHistory = [];
 let currentSessionId = null;
 let chatSessions = [];
 
+// Global variables for streaming control
+let activeEventSource = null;
+let isStreaming = false;
+
 // Load chat sessions from localStorage
 function loadChatSessions() {
     const saved = localStorage.getItem('chatSessions');
@@ -488,34 +492,148 @@ function sendMessage() {
         welcomeScreen.style.display = 'none';
     }
     
-    // Add user message
-    addMessage(message, 'user');
+    // Add user message to history first
+    conversationHistory.push({ text: message, type: 'user', timestamp: Date.now() });
+    
+    // Add user message to DOM
+    addMessageToDOM(message, 'user');
     input.value = '';
     
     // Show typing indicator
     showTypingIndicator();
     
-    // Send to API
-    fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            message: message,
-            session_id: currentSessionId || generateSessionId()
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        hideTypingIndicator();
-        if (data.response) {
-            addMessage(data.response, 'bot');
-        }
-    })
-    .catch(error => {
-        hideTypingIndicator();
-        console.error('Error:', error);
-        addMessage('حدث خطأ في الاتصال', 'bot');
+    // Change button to stop icon
+    toggleSendButton(true);
+    isStreaming = true;
+    
+    // Always use streaming for real-time response
+    const url = '/stream-chat?' + new URLSearchParams({
+        message: message,
+        current_session_id: currentSessionId || ''
     });
+    
+    const eventSource = new EventSource(url);
+    activeEventSource = eventSource;
+    
+    let botMessageDiv = null;
+    let botContent = null;
+    let fullResponse = '';
+    let hasError = false;
+    
+    eventSource.onmessage = function(event) {
+        // Hide typing indicator on first chunk
+        if (!botMessageDiv) {
+            hideTypingIndicator();
+        }
+        
+        const chunk = event.data;
+        fullResponse += chunk;
+        
+        // Create bot message div if it doesn't exist
+        if (!botMessageDiv) {
+            const container = document.getElementById('chatMessages');
+            botMessageDiv = document.createElement('div');
+            botMessageDiv.className = 'message bot';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = 'AI';
+            
+            botContent = document.createElement('div');
+            botContent.className = 'message-content';
+            
+            botMessageDiv.appendChild(avatar);
+            botMessageDiv.appendChild(botContent);
+            container.appendChild(botMessageDiv);
+        }
+        
+        // Update content with streaming text
+        botContent.textContent = fullResponse;
+        
+        // Scroll to bottom
+        const container = document.getElementById('chatMessages');
+        container.scrollTop = container.scrollHeight;
+    };
+    
+    eventSource.onerror = function(error) {
+        hideTypingIndicator();
+        toggleSendButton(false);
+        isStreaming = false;
+        activeEventSource = null;
+        hasError = true;
+        eventSource.close();
+        
+        console.error('Streaming error:', error);
+        
+        if (!fullResponse) {
+            // No response received, show error message
+            addMessageToDOM('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.', 'bot');
+            conversationHistory.push({ text: 'حدث خطأ في الاتصال', type: 'bot', timestamp: Date.now() });
+        } else {
+            // Partial response received, save it
+            conversationHistory.push({ text: fullResponse, type: 'bot', timestamp: Date.now() });
+        }
+        
+        saveCurrentSession();
+    };
+    
+    eventSource.addEventListener('end', function(event) {
+        eventSource.close();
+        toggleSendButton(false);
+        isStreaming = false;
+        activeEventSource = null;
+        
+        if (!hasError && fullResponse) {
+            // Save complete response to history
+            conversationHistory.push({ text: fullResponse, type: 'bot', timestamp: Date.now() });
+            saveCurrentSession();
+        }
+    });
+    
+    // Timeout safety - close after 5 minutes
+    setTimeout(() => {
+        if (eventSource.readyState !== EventSource.CLOSED) {
+            eventSource.close();
+            toggleSendButton(false);
+            isStreaming = false;
+            activeEventSource = null;
+            if (fullResponse) {
+                conversationHistory.push({ text: fullResponse, type: 'bot', timestamp: Date.now() });
+                saveCurrentSession();
+            }
+        }
+    }, 300000);
+}
+
+// Toggle send button between send and stop icons
+function toggleSendButton(showStop) {
+    const sendIcon = document.getElementById('sendIcon');
+    const stopIcon = document.getElementById('stopIcon');
+    
+    if (sendIcon && stopIcon) {
+        if (showStop) {
+            sendIcon.style.display = 'none';
+            stopIcon.style.display = 'block';
+        } else {
+            sendIcon.style.display = 'block';
+            stopIcon.style.display = 'none';
+        }
+    }
+}
+
+// Handle send button click - either send or stop
+function handleSendButton() {
+    if (isStreaming && activeEventSource) {
+        // Stop streaming
+        activeEventSource.close();
+        activeEventSource = null;
+        isStreaming = false;
+        toggleSendButton(false);
+        hideTypingIndicator();
+    } else {
+        // Send message
+        sendMessage();
+    }
 }
 
 function sendQuickMessage(message) {

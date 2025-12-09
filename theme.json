@@ -1,34 +1,48 @@
 {
     "colors": {
-        "primary": "#000000",
-        "primary_dark": "#000000",
-        "primary_light": "#000000",
+        "primary": "#00a651",
+        "primary_dark": "#008542",
+        "primary_light": "#e8f5e9",
         "secondary": "#1e88e5",
-        "background": "#c19090",
-        "sidebar": "#cf9191",
-        "sidebar_text": "#000000",
-        "text_primary": "#000000",
-        "text_secondary": "#000000",
-        "user_msg_bg": "#ffffff",
+        "background": "#323a44",
+        "sidebar": "#000000",
+        "sidebar_text": "#ffffff",
+        "text_primary": "#ffffff",
+        "text_secondary": "#ffffff",
+        "user_msg_bg": "#f0f4f8",
         "bot_msg_bg": "#ffffff",
         "ai_badge_bg": "#00a651",
         "taskbar_icons_color": "#ffffff",
-        "app_title_color": "#ac069e",
-        "header_bar_bg_color": "#000000",
-        "widget_bg_color": "#000000",
-        "widget_border_color": "#000000",
+        "app_title_color": "#ffffff",
+        "header_bar_bg_color": "#19192d",
+        "widget_bg_color": "#1e1e32",
+        "widget_border_color": "#ffffff",
         "widget_title_color": "#ffffff",
-        "widget_text_color": "#ffffff",
-        "widget_icon_ai": "#000000",
+        "widget_text_color": "#cccccc",
+        "widget_icon_ai": "#667eea",
         "widget_icon_chat": "#0078d4",
         "widget_icon_system": "#00a651",
         "widget_icon_actions": "#ff6b6b"
     },
+    "opacity": {
+        "sidebar": 100,
+        "background": 100,
+        "widget": 50,
+        "chat_msg": 52
+    },
     "font": "Cairo",
+    "app_name": {
+        "ar": "نموذج الذكاء الاصطناعي للبيانات",
+        "en": "DataScience LLM Chat Model"
+    },
+    "chat_header_title": {
+        "ar": "مساعد الذكاء الاصطناعي",
+        "en": "AI Assistant"
+    },
     "logo": {
         "type": "image",
         "text": "",
-        "url": "/static/uploads/b198dd87b31e1438_logo_dark.png"
+        "url": ""
     },
-    "background_image": "/static/uploads/7bfdc0256681ca10_pexels-photospublic-33041.jpg"
+    "background_image": "/static/uploads/633c412d64887309_abstract-design-background-smooth-flowing-lines.jpg"
 }

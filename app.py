@@ -72,6 +72,14 @@ def load_theme_settings():
             'ai_badge_bg': '#00A651'
         },
         'font': 'Cairo',
+        'app_name': {
+            'ar': 'نموذج الذكاء الاصطناعي للبيانات',
+            'en': 'DataScience LLM Chat Model'
+        },
+        'chat_header_title': {
+            'ar': 'مساعد الذكاء الاصطناعي',
+            'en': 'AI Assistant'
+        },
         'logo': {
             'type': 'text',
             'text': 'DS',
@@ -317,34 +325,84 @@ def chat():
         error_msg = f'حدث خطأ: {str(e)}' if lang == 'ar' else f'Error: {str(e)}'
         return jsonify({'error': error_msg}), 500
 
-@app.route('/stream-chat', methods=['POST'])
+@app.route('/stream-chat', methods=['POST', 'GET'])
 @login_required
 def stream_chat():
     """Handle streaming chat messages"""
     try:
         from flask import Response, stream_with_context
         
-        data = request.get_json()
-        message = data.get('message', '')
+        # Support both POST and GET (for EventSource)
+        if request.method == 'GET':
+            message = request.args.get('message', '')
+            current_session_id = request.args.get('current_session_id')
+        else:
+            data = request.get_json()
+            message = data.get('message', '')
+            current_session_id = data.get('current_session_id')
         
         if not message:
-            return jsonify({'error': 'الرجاء إدخال رسالة'}), 400
+            lang = session.get('language', 'ar')
+            error_msg = 'الرجاء إدخال رسالة' if lang == 'ar' else 'Please enter a message'
+            return jsonify({'error': error_msg}), 400
         
         session_key = session.get('session_key', str(uuid.uuid4()))
         session['session_key'] = session_key
+        user_id = session.get('user_id')
+        
+        full_response = []
         
         def generate():
             for chunk in chat_agent.generate_response(message, session_key):
                 if chunk:
+                    full_response.append(chunk)
                     yield f"data: {chunk}\n\n"
+            
+            # Save to chat history after streaming completes
+            if user_id:
+                complete_response = ''.join(full_response)
+                if current_session_id:
+                    for chat_session in chat_sessions.get(user_id, []):
+                        if chat_session['id'] == current_session_id:
+                            chat_session['messages'].append({
+                                'user': message,
+                                'bot': complete_response,
+                                'timestamp': datetime.now().isoformat()
+                            })
+                            chat_session['updated_at'] = datetime.now().isoformat()
+                            chat_session['title'] = message[:50] + ('...' if len(message) > 50 else '')
+                            break
+                else:
+                    new_session = {
+                        'id': str(uuid.uuid4()),
+                        'title': message[:50] + ('...' if len(message) > 50 else ''),
+                        'created_at': datetime.now().isoformat(),
+                        'updated_at': datetime.now().isoformat(),
+                        'messages': [{
+                            'user': message,
+                            'bot': complete_response,
+                            'timestamp': datetime.now().isoformat()
+                        }]
+                    }
+                    if user_id not in chat_sessions:
+                        chat_sessions[user_id] = []
+                    chat_sessions[user_id].insert(0, new_session)
+            
+            yield "event: end\ndata: complete\n\n"
         
         return Response(
             stream_with_context(generate()),
-            mimetype='text/event-stream'
+            mimetype='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'X-Accel-Buffering': 'no'
+            }
         )
     
     except Exception as e:
-        return jsonify({'error': f'حدث خطأ: {str(e)}'}), 500
+        lang = session.get('language', 'ar')
+        error_msg = f'حدث خطأ: {str(e)}' if lang == 'ar' else f'Error: {str(e)}'
+        return jsonify({'error': error_msg}), 500
 
 @app.route('/new-session', methods=['POST'])
 @login_required
@@ -684,8 +742,16 @@ def hex_to_rgba(hex_color, opacity=1.0):
 def custom_theme_css():
     theme = load_theme_settings()
     colors = theme.get('colors', {})
+    opacity = theme.get('opacity', {})
     font = theme.get('font', 'Cairo')
     background_image = theme.get('background_image', '')
+    
+    # Get opacity values (convert from 0-100 to 0-1)
+    # Note: 0% = no transparency (solid), 100% = full transparency
+    sidebar_opacity = 1 - (opacity.get('sidebar', 0) / 100)
+    background_opacity = 1 - (opacity.get('background', 0) / 100)
+    widget_opacity = 1 - (opacity.get('widget', 0) / 100)
+    chat_msg_opacity = 1 - (opacity.get('chat_msg', 0) / 100)
     
     # Get background color and create rgba version for glass effect
     bg_color = colors.get('background', '#F5F7FA')
@@ -708,10 +774,10 @@ def custom_theme_css():
         /* Background Colors */
         --color-background: {bg_color};
         --bg-color: {bg_color};
-        --glass-bg: {hex_to_rgba(bg_color, 0.15)};
+        --glass-bg: {hex_to_rgba(bg_color, background_opacity)};
         
         /* Sidebar */
-        --color-sidebar: {hex_to_rgba(sidebar_color, 0.2)};
+        --color-sidebar: {hex_to_rgba(sidebar_color, sidebar_opacity)};
         --color-sidebar-text: {colors.get('sidebar_text', '#1A1D1F')};
         
         /* Text Colors */
@@ -721,8 +787,8 @@ def custom_theme_css():
         --text-secondary: {colors.get('text_secondary', '#6F7782')};
         
         /* Message Colors */
-        --user-message-bg: {hex_to_rgba(colors.get('user_msg_bg', '#F0F4F8'), 0.4)};
-        --bot-message-bg: {hex_to_rgba(colors.get('bot_msg_bg', '#FFFFFF'), 0.3)};
+        --user-message-bg: {hex_to_rgba(colors.get('user_msg_bg', '#F0F4F8'), chat_msg_opacity)};
+        --bot-message-bg: {hex_to_rgba(colors.get('bot_msg_bg', '#FFFFFF'), chat_msg_opacity)};
         --ai-badge-bg: {colors.get('ai_badge_bg', '#00A651')};
         
         /* App Title Color */
@@ -732,8 +798,8 @@ def custom_theme_css():
         --taskbar-icons-color: {colors.get('taskbar_icons_color', '#FFFFFF')};
         
         /* Widget Colors */
-        --header-bar-bg-color: {colors.get('header_bar_bg_color', '#19192D')};
-        --widget-bg-color: {colors.get('widget_bg_color', '#1E1E32')};
+        --header-bar-bg-color: {hex_to_rgba(colors.get('header_bar_bg_color', '#19192D'), widget_opacity)};
+        --widget-bg-color: {hex_to_rgba(colors.get('widget_bg_color', '#1E1E32'), widget_opacity)};
         --widget-border-color: {colors.get('widget_border_color', '#FFFFFF')};
         --widget-title-color: {colors.get('widget_title_color', '#FFFFFF')};
         --widget-text-color: {colors.get('widget_text_color', '#CCCCCC')};
@@ -741,6 +807,12 @@ def custom_theme_css():
         --widget-icon-chat: {colors.get('widget_icon_chat', '#0078D4')};
         --widget-icon-system: {colors.get('widget_icon_system', '#00A651')};
         --widget-icon-actions: {colors.get('widget_icon_actions', '#FF6B6B')};
+        
+        /* Opacity values */
+        --sidebar-opacity: {sidebar_opacity};
+        --background-opacity: {background_opacity};
+        --widget-opacity: {widget_opacity};
+        --chat-msg-opacity: {chat_msg_opacity};
         
         /* Font */
         --font-primary: '{font}', sans-serif;
@@ -770,30 +842,30 @@ def custom_theme_css():
     
     /* Windows Glass Effect - More Transparent */
     .app-window {{
-        background: {hex_to_rgba(bg_color, 0.25)} !important;
-        backdrop-filter: blur(40px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+        background: {hex_to_rgba(bg_color, background_opacity)} !important;
+        backdrop-filter: blur(calc((1 - {background_opacity}) * 40px)) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(calc((1 - {background_opacity}) * 40px)) saturate(180%) !important;
     }}
     
     /* Chat Sidebar - Glass Effect */
     .chat-sidebar {{
-        background: {hex_to_rgba(sidebar_color, 0.2)} !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
+        background: {hex_to_rgba(sidebar_color, sidebar_opacity)} !important;
+        backdrop-filter: blur(calc((1 - {sidebar_opacity}) * 20px)) !important;
+        -webkit-backdrop-filter: blur(calc((1 - {sidebar_opacity}) * 20px)) !important;
     }}
     
     /* Chat Main Area - Glass Effect */
     .chat-main {{
-        background: {hex_to_rgba(bg_color, 0.1)} !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        background: {hex_to_rgba(bg_color, background_opacity)} !important;
+        backdrop-filter: blur(calc((1 - {background_opacity}) * 10px)) !important;
+        -webkit-backdrop-filter: blur(calc((1 - {background_opacity}) * 10px)) !important;
     }}
     
     /* Window Header */
     .window-header {{
-        background: {hex_to_rgba(sidebar_color, 0.15)} !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        background: {hex_to_rgba(sidebar_color, sidebar_opacity)} !important;
+        backdrop-filter: blur(calc((1 - {sidebar_opacity}) * 10px)) !important;
+        -webkit-backdrop-filter: blur(calc((1 - {sidebar_opacity}) * 10px)) !important;
     }}
     
     /* Taskbar - Glass Effect */
@@ -841,9 +913,9 @@ def custom_theme_css():
     
     /* Start Menu - Glass Effect */
     .start-menu {{
-        background: {hex_to_rgba(bg_color, 0.25)} !important;
-        backdrop-filter: blur(50px) saturate(200%) !important;
-        -webkit-backdrop-filter: blur(50px) saturate(200%) !important;
+        background: {hex_to_rgba(bg_color, background_opacity)} !important;
+        backdrop-filter: blur(calc((1 - {background_opacity}) * 50px)) saturate(200%) !important;
+        -webkit-backdrop-filter: blur(calc((1 - {background_opacity}) * 50px)) saturate(200%) !important;
     }}
     
     .start-btn:hover {{
@@ -852,9 +924,9 @@ def custom_theme_css():
     
     /* User Dropdown - Glass Effect */
     .user-dropdown {{
-        background: {hex_to_rgba(bg_color, 0.25)} !important;
-        backdrop-filter: blur(50px) saturate(200%) !important;
-        -webkit-backdrop-filter: blur(50px) saturate(200%) !important;
+        background: {hex_to_rgba(bg_color, background_opacity)} !important;
+        backdrop-filter: blur(calc((1 - {background_opacity}) * 50px)) saturate(200%) !important;
+        -webkit-backdrop-filter: blur(calc((1 - {background_opacity}) * 50px)) saturate(200%) !important;
     }}
     
     /* User Avatar */
@@ -876,32 +948,32 @@ def custom_theme_css():
     
     /* Input Wrapper - Glass Effect */
     .input-wrapper {{
-        background: {hex_to_rgba(bg_color, 0.2)} !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        background: {hex_to_rgba(bg_color, background_opacity)} !important;
+        backdrop-filter: blur(calc((1 - {background_opacity}) * 10px)) !important;
+        -webkit-backdrop-filter: blur(calc((1 - {background_opacity}) * 10px)) !important;
     }}
     
     /* Quick Actions - Glass Effect */
     .quick-action {{
-        background: {hex_to_rgba(sidebar_color, 0.2)} !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        background: {hex_to_rgba(sidebar_color, sidebar_opacity)} !important;
+        backdrop-filter: blur(calc((1 - {sidebar_opacity}) * 10px)) !important;
+        -webkit-backdrop-filter: blur(calc((1 - {sidebar_opacity}) * 10px)) !important;
     }}
     
     /* Suggestions - Glass Effect */
     .suggestion {{
-        background: {hex_to_rgba(bg_color, 0.15)} !important;
+        background: {hex_to_rgba(bg_color, background_opacity)} !important;
     }}
     
     /* Header Bar Styling */
     .top-header-bar {{
-        background: {hex_to_rgba(colors.get('header_bar_bg_color', '#19192D'), 0.45)} !important;
+        background: {hex_to_rgba(colors.get('header_bar_bg_color', '#19192D'), widget_opacity)} !important;
     }}
     
     /* Desktop Widgets Styling */
     .desktop-widget {{
-        background: {hex_to_rgba(colors.get('widget_bg_color', '#1E1E32'), 0.4)} !important;
-        border-color: {hex_to_rgba(colors.get('widget_border_color', '#FFFFFF'), 0.2)} !important;
+        background: {hex_to_rgba(colors.get('widget_bg_color', '#1E1E32'), widget_opacity)} !important;
+        border-color: {hex_to_rgba(colors.get('widget_border_color', '#FFFFFF'), widget_opacity)} !important;
     }}
     
     .widget-title {{
@@ -937,7 +1009,7 @@ def custom_theme_css():
     
     /* Legacy Main Content */
     .main-content {{
-        background: {hex_to_rgba(bg_color, 0.2)} !important;
+        background: {hex_to_rgba(bg_color, background_opacity)} !important;
     }}
     
     .vr-background {{
@@ -1282,4 +1354,5 @@ def get_active_widgets():
     return jsonify({'widgets': active_widgets})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=True, port=5000)
+

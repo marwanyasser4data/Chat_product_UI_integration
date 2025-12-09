@@ -95,6 +95,27 @@ const translations = {
         widgets: 'الأدوات',
         chat: 'الدردشة',
         
+        // Widget Stats
+        aiModels: 'نماذج الذكاء الاصطناعي',
+        chatStats: 'إحصائيات الدردشة',
+        totalConversations: 'إجمالي المحادثات',
+        todayConversations: 'محادثات اليوم',
+        totalMessages: 'إجمالي الرسائل',
+        avgResponse: 'متوسط الاستجابة',
+        systemStatus: 'حالة النظام',
+        quickActions: 'إجراءات سريعة',
+        readyToHelp: 'جاهز للمساعدة',
+        
+        // Chat Actions & Messages
+        welcomeMessage: 'مرحباً! كيف يمكنني مساعدتك اليوم؟',
+        explainConcepts: 'اشرح المفاهيم',
+        writeCode: 'اكتب كود',
+        analyzeData: 'حلل البيانات',
+        translate: 'ترجم نصاً',
+        tryAsking: 'جرب أن تسأل:',
+        typeMessageAdvanced: 'اكتب رسالتك هنا... استخدم @ للإشارة، / للأوامر',
+        chatSearchInput: 'ابحث في الرسائل...',
+        
         // Settings Tabs
         generalTab: 'عام',
         aiTab: 'الذكاء الاصطناعي',
@@ -361,6 +382,27 @@ const translations = {
         controlPanel: 'Control Panel',
         widgets: 'Widgets',
         chat: 'Chat',
+        
+        // Widget Stats
+        aiModels: 'AI Models',
+        chatStats: 'Chat Statistics',
+        totalConversations: 'Total Conversations',
+        todayConversations: 'Today\'s Conversations',
+        totalMessages: 'Total Messages',
+        avgResponse: 'Average Response Time',
+        systemStatus: 'System Status',
+        quickActions: 'Quick Actions',
+        readyToHelp: 'Ready to Help',
+        
+        // Chat Actions & Messages
+        welcomeMessage: 'Hello! How can I help you today?',
+        explainConcepts: 'Explain Concepts',
+        writeCode: 'Write Code',
+        analyzeData: 'Analyze Data',
+        translate: 'Translate Text',
+        tryAsking: 'Try Asking:',
+        typeMessageAdvanced: 'Type your message here... Use @ to mention, / for commands',
+        chatSearchInput: 'Search messages...',
         
         // Settings Tabs
         generalTab: 'General',
