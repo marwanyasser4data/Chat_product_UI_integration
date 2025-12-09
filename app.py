@@ -336,17 +336,23 @@ def stream_chat():
         # Support both POST and GET (for EventSource)
         if request.method == 'GET':
             message = request.args.get('message', '')
+            session_id = request.args.get('session_id', '')
         else:
             data = request.get_json()
             message = data.get('message', '')
+            session_id = data.get('session_id', '')
         
         if not message:
             lang = session.get('language', 'ar')
             error_msg = 'الرجاء إدخال رسالة' if lang == 'ar' else 'Please enter a message'
             return jsonify({'error': error_msg}), 400
         
-        session_key = session.get('session_key', str(uuid.uuid4()))
-        session['session_key'] = session_key
+        # Use session_id from frontend if provided, otherwise use/create Flask session key
+        if session_id:
+            session_key = session_id
+        else:
+            session_key = session.get('session_key', str(uuid.uuid4()))
+            session['session_key'] = session_key
         
         def generate():
             for chunk in chat_agent.generate_response(message, session_key):

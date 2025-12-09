@@ -514,7 +514,8 @@ function sendMessage() {
     
     // Always use streaming for real-time response
     const url = '/stream-chat?' + new URLSearchParams({
-        message: message
+        message: message,
+        session_id: currentSessionId || ''
     });
     
     console.log('[Chat] Sending message to session:', currentSessionId);
@@ -753,8 +754,7 @@ function hideTypingIndicator() {
 }
 
 function generateSessionId() {
-    currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    return currentSessionId;
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
 // ============ Utility Functions ============
