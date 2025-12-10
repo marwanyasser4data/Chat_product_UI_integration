@@ -1439,7 +1439,7 @@
     </div>
 
     <!-- Marked.js for Markdown parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="{{ url_for('static', filename='marked.min.js') }}"></script>
     <script>
         // Verify marked.js is loaded
         if (typeof marked !== 'undefined') {
