@@ -386,7 +386,10 @@ def stream_chat():
         def generate():
             for chunk in chat_agent.generate_response(message, session_key):
                 if chunk:
-                    yield f"data: {chunk}\n\n"
+                    # JSON encode the chunk to properly escape newlines and special characters
+                    import json
+                    encoded_chunk = json.dumps(chunk, ensure_ascii=False)
+                    yield f"data: {encoded_chunk}\n\n"
             
             yield "event: end\ndata: complete\n\n"
         

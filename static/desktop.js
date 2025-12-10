@@ -648,7 +648,15 @@ function sendMessage() {
             hideTypingIndicator();
         }
 
-        const chunk = event.data;
+        // Decode the JSON-encoded chunk
+        let chunk;
+        try {
+            chunk = JSON.parse(event.data);
+        } catch (e) {
+            // Fallback for non-JSON data
+            chunk = event.data;
+        }
+
         fullResponse += chunk;
 
         // Create bot message div if it doesn't exist
