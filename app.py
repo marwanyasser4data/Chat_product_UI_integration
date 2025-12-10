@@ -264,6 +264,35 @@ def index():
     
     return render_template('desktop.html', lang=lang, theme=theme, theme_settings=theme_settings, user_role=user_role, timestamp=int(datetime.now().timestamp()))
 
+@app.route('/dashboard')
+def dashboard():
+    """Render dashboard page without widgets"""
+    # Auto-login as admin for SaaS integration
+    if 'username' not in session:
+        session['username'] = 'admin'
+        session['role'] = 'admin'
+        session['user_display_name'] = 'Administrator'
+        session['language'] = 'en'
+    
+    if 'session_key' not in session:
+        session['session_key'] = str(uuid.uuid4())
+    
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
+    
+    user_id = session['user_id']
+    if user_id not in chat_sessions:
+        chat_sessions[user_id] = []
+    
+    lang = request.args.get('lang', session.get('language', 'en'))
+    session['language'] = lang
+    
+    theme = get_current_theme()
+    theme_settings = load_theme_settings()
+    user_role = session.get('role', 'user')
+    
+    return render_template('dashboard.html', lang=lang, theme=theme, theme_settings=theme_settings, user_role=user_role, timestamp=int(datetime.now().timestamp()))
+
 @app.route('/chat', methods=['POST'])
 def chat():
     """Handle chat messages"""

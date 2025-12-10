@@ -3806,3 +3806,189 @@ body.light-mode .start-menu {
     50% { opacity: 1; transform: scale(1); }
 }
 
+/* ===== Dashboard Header Styles ===== */
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(10, 15, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 250px;
+}
+
+.dashboard-logo img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.dashboard-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
+}
+
+.dashboard-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.dashboard-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-menu-btn.active {
+    background: rgba(0, 166, 81, 0.15);
+    color: #00A651;
+    border-color: rgba(0, 166, 81, 0.3);
+}
+
+.dashboard-menu-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: #00A651;
+}
+
+.dashboard-menu-btn svg {
+    flex-shrink: 0;
+}
+
+.dashboard-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 250px;
+    justify-content: flex-end;
+}
+
+.dashboard-search-btn,
+.dashboard-settings-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dashboard-search-btn:hover,
+.dashboard-settings-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dashboard-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px 8px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dashboard-user-profile:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.user-avatar-dash {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(0, 166, 81, 0.3);
+}
+
+.user-info-dash {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-name-dash {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+}
+
+.user-role-dash {
+    font-size: 13px;
+    color: white;
+    font-weight: 600;
+}
+
+/* ===== Responsive Dashboard ===== */
+@media (max-width: 1200px) {
+    .dashboard-menu-btn span {
+        display: none;
+    }
+    
+    .dashboard-menu-btn {
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 0 15px;
+        height: 60px;
+    }
+    
+    .dashboard-logo,
+    .dashboard-user {
+        min-width: auto;
+    }
+    
+    .user-info-dash {
+        display: none;
+    }
+    
+    .dashboard-search-btn {
+        display: none;
+    }
+}
+

@@ -266,6 +266,7 @@ const translations = {
         help: 'المساعدة',
         
         // Taskbar
+        Dashboard: 'لوحة القيادة',
         chatTitle: 'الدردشة',
         widgetsTitle: 'الأدوات',
         settingsTitle: 'الإعدادات',
@@ -554,6 +555,7 @@ const translations = {
         help: 'Help',
         
         // Taskbar
+        Dashboard: 'Dashboard',
         chatTitle: 'Chat',
         widgetsTitle: 'Widgets',
         settingsTitle: 'Settings',
