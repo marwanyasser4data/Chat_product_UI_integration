@@ -7,8 +7,105 @@ const windowState = {
     zIndex: 10
 };
 
+// Simple Markdown Parser (fallback for when marked.js doesn't work)
+function simpleMarkdown(text) {
+    if (!text) return '';
+
+    let html = text;
+
+    // Escape HTML first
+    html = html.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    // Code blocks (triple backticks)
+    html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, function (match, lang, code) {
+        return '<pre><code class="language-' + lang + '">' + code.trim() + '</code></pre>';
+    });
+
+    // Inline code (single backticks)
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Headers
+    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+    // Bold
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+
+    // Italic
+    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+    // Strikethrough
+    html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+
+    // Unordered lists
+    html = html.replace(/^[\*\-] (.+)$/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+
+    // Ordered lists
+    html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+
+    // Links
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+    // Blockquotes
+    html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+
+    // Horizontal rules
+    html = html.replace(/^---+$/gm, '<hr>');
+
+    // Paragraphs - convert double newlines to paragraph breaks
+    html = html.replace(/\n\n+/g, '</p><p>');
+
+    // Single newlines to <br>
+    html = html.replace(/\n/g, '<br>');
+
+    // Wrap in paragraph if not already wrapped
+    if (!html.startsWith('<')) {
+        html = '<p>' + html + '</p>';
+    }
+
+    // Clean up empty paragraphs
+    html = html.replace(/<p><\/p>/g, '');
+    html = html.replace(/<p>(<h[1-6]>)/g, '$1');
+    html = html.replace(/(<\/h[1-6]>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<pre>)/g, '$1');
+    html = html.replace(/(<\/pre>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<ul>)/g, '$1');
+    html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<blockquote>)/g, '$1');
+    html = html.replace(/(<\/blockquote>)<\/p>/g, '$1');
+
+    return html;
+}
+
+// Helper function to parse markdown - uses marked.js if available, falls back to simple parser
+function parseMarkdown(text) {
+    if (!text) return '';
+
+    // Try marked.js first
+    if (typeof marked !== 'undefined') {
+        try {
+            if (typeof marked.parse === 'function') {
+                return marked.parse(text);
+            } else if (typeof marked === 'function') {
+                return marked(text);
+            }
+        } catch (e) {
+            console.warn('marked.js error, using fallback:', e);
+        }
+    }
+
+    // Fallback to simple parser
+    return simpleMarkdown(text);
+}
+
 // Initialize on DOM Load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initClock();
     initWindowDragging();
     initKeyboardShortcuts();
@@ -25,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function toggleWindow(windowId) {
     const window = document.getElementById(windowId);
     if (!window) return;
-    
+
     if (window.style.display === 'none') {
         openWindow(windowId);
     } else {
@@ -36,12 +133,12 @@ function toggleWindow(windowId) {
 function openWindow(windowId) {
     const window = document.getElementById(windowId);
     if (!window) return;
-    
+
     window.style.display = 'flex';
     window.classList.remove('closing');
     bringToFront(windowId);
     updateTaskbarButton(windowId, true);
-    
+
     if (!windowState.openWindows.includes(windowId)) {
         windowState.openWindows.push(windowId);
     }
@@ -50,14 +147,14 @@ function openWindow(windowId) {
 function closeWindow(windowId) {
     const window = document.getElementById(windowId);
     if (!window) return;
-    
+
     window.classList.add('closing');
-    
+
     setTimeout(() => {
         window.style.display = 'none';
         window.classList.remove('closing');
         updateTaskbarButton(windowId, false);
-        
+
         const index = windowState.openWindows.indexOf(windowId);
         if (index > -1) {
             windowState.openWindows.splice(index, 1);
@@ -68,7 +165,7 @@ function closeWindow(windowId) {
 function minimizeWindow(windowId) {
     const window = document.getElementById(windowId);
     if (!window) return;
-    
+
     window.style.display = 'none';
     updateTaskbarButton(windowId, false);
 }
@@ -76,7 +173,7 @@ function minimizeWindow(windowId) {
 function toggleMaximize(windowId) {
     const window = document.getElementById(windowId);
     if (!window) return;
-    
+
     window.classList.toggle('maximized');
 }
 
@@ -124,44 +221,44 @@ function initClock() {
 
 function updateClock() {
     const now = new Date();
-    
+
     // Taskbar time
-    const timeStr = now.toLocaleTimeString('ar-SA', { 
-        hour: '2-digit', 
+    const timeStr = now.toLocaleTimeString('ar-SA', {
+        hour: '2-digit',
         minute: '2-digit',
-        hour12: false 
+        hour12: false
     });
-    const dateStr = now.toLocaleDateString('ar-SA', { 
-        day: 'numeric', 
-        month: 'numeric' 
+    const dateStr = now.toLocaleDateString('ar-SA', {
+        day: 'numeric',
+        month: 'numeric'
     });
-    
+
     const taskbarTime = document.getElementById('taskbarTime');
     const taskbarDate = document.getElementById('taskbarDate');
     if (taskbarTime) taskbarTime.textContent = timeStr;
     if (taskbarDate) taskbarDate.textContent = dateStr;
-    
+
     // Header bar clock
     const headerTime = document.getElementById('headerTime');
     const headerDate = document.getElementById('headerDate');
     if (headerTime) headerTime.textContent = timeStr;
     if (headerDate) {
-        headerDate.textContent = now.toLocaleDateString('ar-SA', { 
-            day: 'numeric', 
+        headerDate.textContent = now.toLocaleDateString('ar-SA', {
+            day: 'numeric',
             month: 'short',
             year: 'numeric'
         });
     }
-    
+
     // Widget clock
     const clockTime = document.getElementById('clockTime');
     const clockDate = document.getElementById('clockDate');
     if (clockTime) clockTime.textContent = timeStr;
     if (clockDate) {
-        clockDate.textContent = now.toLocaleDateString('ar-SA', { 
+        clockDate.textContent = now.toLocaleDateString('ar-SA', {
             weekday: 'long',
-            day: 'numeric', 
-            month: 'long' 
+            day: 'numeric',
+            month: 'long'
         });
     }
 }
@@ -174,25 +271,25 @@ function setLanguage(lang) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language: lang })
     }).then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update localStorage
-            localStorage.setItem('preferredLanguage', lang);
-            // Reload page to apply changes
+        .then(data => {
+            if (data.success) {
+                // Update localStorage
+                localStorage.setItem('preferredLanguage', lang);
+                // Reload page to apply changes
+                window.location.reload();
+            }
+        }).catch(err => {
+            console.error('Language change error:', err);
             window.location.reload();
-        }
-    }).catch(err => {
-        console.error('Language change error:', err);
-        window.location.reload();
-    });
+        });
 }
 
 function applyTranslations() {
     const lang = document.documentElement.lang || 'ar';
     if (typeof translations === 'undefined') return;
-    
+
     const trans = translations[lang] || translations['ar'];
-    
+
     // Update all elements with data-i18n attribute
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -200,7 +297,7 @@ function applyTranslations() {
             el.textContent = trans[key];
         }
     });
-    
+
     // Update placeholders
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
@@ -208,7 +305,7 @@ function applyTranslations() {
             el.placeholder = trans[key];
         }
     });
-    
+
     // Update titles
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
         const key = el.getAttribute('data-i18n-title');
@@ -230,38 +327,38 @@ function initWindowDragging() {
     document.querySelectorAll('.window-header').forEach(header => {
         let isDragging = false;
         let startX, startY, startLeft, startTop;
-        
-        header.addEventListener('mousedown', function(e) {
+
+        header.addEventListener('mousedown', function (e) {
             if (e.target.closest('.window-controls')) return;
-            
+
             const window = header.closest('.app-window');
             if (window.classList.contains('maximized')) return;
-            
+
             isDragging = true;
             bringToFront(window.id);
-            
+
             const rect = window.getBoundingClientRect();
             startX = e.clientX;
             startY = e.clientY;
             startLeft = rect.left;
             startTop = rect.top;
-            
+
             window.style.transition = 'none';
         });
-        
-        document.addEventListener('mousemove', function(e) {
+
+        document.addEventListener('mousemove', function (e) {
             if (!isDragging) return;
-            
+
             const window = header.closest('.app-window');
             const deltaX = e.clientX - startX;
             const deltaY = e.clientY - startY;
-            
+
             window.style.left = startLeft + deltaX + 'px';
             window.style.top = startTop + deltaY + 'px';
             window.style.transform = 'none';
         });
-        
-        document.addEventListener('mouseup', function() {
+
+        document.addEventListener('mouseup', function () {
             if (isDragging) {
                 isDragging = false;
                 const window = header.closest('.app-window');
@@ -274,7 +371,7 @@ function initWindowDragging() {
 // ============ Keyboard Shortcuts ============
 
 function initKeyboardShortcuts() {
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         // Escape to close active window
         if (e.key === 'Escape') {
             if (windowState.activeWindow) {
@@ -282,7 +379,7 @@ function initKeyboardShortcuts() {
             }
             closeStartMenu();
         }
-        
+
         // Enter to send message
         if (e.key === 'Enter' && !e.shiftKey) {
             const input = document.getElementById('messageInput');
@@ -297,14 +394,14 @@ function initKeyboardShortcuts() {
 // ============ Click Outside ============
 
 function initClickOutside() {
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         // Close start menu when clicking outside
         const startMenu = document.getElementById('startMenu');
         const startBtn = document.querySelector('.start-btn');
         if (!startMenu.contains(e.target) && !startBtn.contains(e.target)) {
             closeStartMenu();
         }
-        
+
         // Close user dropdown when clicking outside
         const userDropdown = document.getElementById('userDropdown');
         const userBtn = document.querySelector('.user-btn');
@@ -342,12 +439,12 @@ function saveChatSessions() {
 function renderChatHistory() {
     const historyList = document.getElementById('chatHistoryList');
     if (!historyList) return;
-    
+
     if (chatSessions.length === 0) {
         historyList.innerHTML = '<div class="no-history">لا توجد محادثات سابقة</div>';
         return;
     }
-    
+
     historyList.innerHTML = chatSessions.map((session, index) => `
         <div class="history-item ${session.id === currentSessionId ? 'active' : ''}" 
              onclick="loadSession('${session.id}')" data-session="${session.id}">
@@ -369,7 +466,7 @@ function formatDate(timestamp) {
     const date = new Date(timestamp);
     const now = new Date();
     const diff = now - date;
-    
+
     if (diff < 60000) return 'الآن';
     if (diff < 3600000) return `منذ ${Math.floor(diff / 60000)} دقيقة`;
     if (diff < 86400000) return `منذ ${Math.floor(diff / 3600000)} ساعة`;
@@ -382,23 +479,23 @@ function newChat() {
     if (currentSessionId && conversationHistory.length > 0) {
         saveCurrentSession();
     }
-    
+
     // Reset state - session will be created on first message
     conversationHistory = [];
     currentSessionId = null;
-    
+
     renderChatHistory();
-    
+
     const messagesContainer = document.getElementById('chatMessages');
     const welcomeScreen = document.getElementById('welcomeScreen');
-    
+
     // Clear messages and show welcome screen
     if (messagesContainer && welcomeScreen) {
         messagesContainer.innerHTML = '';
         messagesContainer.appendChild(welcomeScreen);
         welcomeScreen.style.display = 'flex';
     }
-    
+
     const input = document.getElementById('messageInput');
     if (input) input.value = '';
 }
@@ -426,21 +523,21 @@ function loadSession(sessionId) {
     if (currentSessionId && conversationHistory.length > 0) {
         saveCurrentSession();
     }
-    
+
     const session = chatSessions.find(s => s.id === sessionId);
     if (!session) return;
-    
+
     currentSessionId = sessionId;
     conversationHistory = session.messages || [];
-    
+
     // Render messages
     const messagesContainer = document.getElementById('chatMessages');
     const welcomeScreen = document.getElementById('welcomeScreen');
-    
+
     if (!messagesContainer) return;
-    
+
     messagesContainer.innerHTML = '';
-    
+
     if (conversationHistory.length === 0) {
         if (welcomeScreen) {
             messagesContainer.appendChild(welcomeScreen);
@@ -452,7 +549,7 @@ function loadSession(sessionId) {
             addMessageToDOM(msg.text, msg.type);
         });
     }
-    
+
     renderChatHistory();
 }
 
@@ -460,7 +557,7 @@ function loadSession(sessionId) {
 function deleteSession(sessionId) {
     chatSessions = chatSessions.filter(s => s.id !== sessionId);
     saveChatSessions();
-    
+
     if (sessionId === currentSessionId) {
         if (chatSessions.length > 0) {
             loadSession(chatSessions[0].id);
@@ -475,9 +572,9 @@ function deleteSession(sessionId) {
 function sendMessage() {
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
-    
+
     if (!message) return;
-    
+
     // Create a new session if one doesn't exist (first message)
     if (!currentSessionId) {
         currentSessionId = generateSessionId();
@@ -491,94 +588,88 @@ function sendMessage() {
         saveChatSessions();
         renderChatHistory();
     }
-    
+
     // Hide welcome screen
     const welcomeScreen = document.getElementById('welcomeScreen');
     if (welcomeScreen) {
         welcomeScreen.style.display = 'none';
     }
-    
+
     // Add user message to history first
     conversationHistory.push({ text: message, type: 'user', timestamp: Date.now() });
-    
+
     // Add user message to DOM
     addMessageToDOM(message, 'user');
     input.value = '';
-    
+
     // Show typing indicator
     showTypingIndicator();
-    
+
     // Change button to stop icon
     toggleSendButton(true);
     isStreaming = true;
-    
+
     // Always use streaming for real-time response
     const url = '/stream-chat?' + new URLSearchParams({
         message: message,
         session_id: currentSessionId || ''
     });
-    
+
     console.log('[Chat] Sending message to session:', currentSessionId);
-    
+
     const eventSource = new EventSource(url);
     activeEventSource = eventSource;
-    
+
     let botMessageDiv = null;
     let botContent = null;
     let fullResponse = '';
     let hasError = false;
-    
-    eventSource.onmessage = function(event) {
+
+    eventSource.onmessage = function (event) {
         // Hide typing indicator on first chunk
         if (!botMessageDiv) {
             hideTypingIndicator();
         }
-        
+
         const chunk = event.data;
         fullResponse += chunk;
-        
+
         // Create bot message div if it doesn't exist
         if (!botMessageDiv) {
             const container = document.getElementById('chatMessages');
             botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'message bot';
-            
+
             const avatar = document.createElement('div');
             avatar.className = 'message-avatar';
             avatar.textContent = 'AI';
-            
+
             botContent = document.createElement('div');
             botContent.className = 'message-content';
-            
+
             botMessageDiv.appendChild(avatar);
             botMessageDiv.appendChild(botContent);
             container.appendChild(botMessageDiv);
         }
-        
+
         // Update content with streaming text (parse Markdown)
-        if (typeof marked !== 'undefined') {
-            console.log('✅ Streaming markdown update, length:', fullResponse.length);
-            botContent.innerHTML = marked.parse(fullResponse);
-        } else {
-            console.warn('⚠️ marked not available during streaming');
-            botContent.textContent = fullResponse;
-        }
-        
+        botContent.innerHTML = parseMarkdown(fullResponse);
+
         // Scroll to bottom
         const container = document.getElementById('chatMessages');
         container.scrollTop = container.scrollHeight;
     };
-    
-    eventSource.onerror = function(error) {
+
+    eventSource.onerror = function (error) {
         hideTypingIndicator();
         toggleSendButton(false);
         isStreaming = false;
         activeEventSource = null;
         hasError = true;
         eventSource.close();
-        
+
         console.error('Streaming error:', error);
-        
+
         if (!fullResponse) {
             // No response received, show error message
             addMessageToDOM('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.', 'bot');
@@ -587,23 +678,23 @@ function sendMessage() {
             // Partial response received, save it
             conversationHistory.push({ text: fullResponse, type: 'bot', timestamp: Date.now() });
         }
-        
+
         saveCurrentSession();
     };
-    
-    eventSource.addEventListener('end', function(event) {
+
+    eventSource.addEventListener('end', function (event) {
         eventSource.close();
         toggleSendButton(false);
         isStreaming = false;
         activeEventSource = null;
-        
+
         if (!hasError && fullResponse) {
             // Save complete response to history
             conversationHistory.push({ text: fullResponse, type: 'bot', timestamp: Date.now() });
             saveCurrentSession();
         }
     });
-    
+
     // Timeout safety - close after 5 minutes
     setTimeout(() => {
         if (eventSource.readyState !== EventSource.CLOSED) {
@@ -623,7 +714,7 @@ function sendMessage() {
 function toggleSendButton(showStop) {
     const sendIcon = document.getElementById('sendIcon');
     const stopIcon = document.getElementById('stopIcon');
-    
+
     if (sendIcon && stopIcon) {
         if (showStop) {
             sendIcon.style.display = 'none';
@@ -663,7 +754,7 @@ function clearHistory() {
         currentSessionId = null;
         saveChatSessions();
         renderChatHistory();
-        
+
         // Reset to welcome screen
         const messagesContainer = document.getElementById('chatMessages');
         const welcomeScreen = document.getElementById('welcomeScreen');
@@ -672,7 +763,7 @@ function clearHistory() {
             messagesContainer.appendChild(welcomeScreen);
             welcomeScreen.style.display = 'flex';
         }
-        
+
         // Update stats
         updateWidgetStats();
     }
@@ -683,7 +774,7 @@ function updateWidgetStats() {
     const totalChats = document.getElementById('totalChats');
     const todayChats = document.getElementById('todayChats');
     const totalMessages = document.getElementById('totalMessages');
-    
+
     if (totalChats) totalChats.textContent = chatSessions.length;
     if (todayChats) {
         const today = new Date().toDateString();
@@ -693,7 +784,7 @@ function updateWidgetStats() {
     if (totalMessages) {
         let msgCount = 0;
         chatSessions.forEach(s => { msgCount += (s.messages?.length || 0); });
-        totalMessages.textContent = msgCount > 999 ? (msgCount/1000).toFixed(1) + 'K' : msgCount;
+        totalMessages.textContent = msgCount > 999 ? (msgCount / 1000).toFixed(1) + 'K' : msgCount;
     }
 }
 
@@ -701,32 +792,28 @@ function updateWidgetStats() {
 function addMessageToDOM(text, type) {
     const container = document.getElementById('chatMessages');
     if (!container) return;
-    
+
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
-    
+
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
     avatar.textContent = type === 'user' ? 'أ' : 'AI';
-    
+
     const content = document.createElement('div');
     content.className = 'message-content';
-    
+
     // Parse Markdown for bot messages
-    if (type === 'bot' && typeof marked !== 'undefined') {
-        console.log('✅ Parsing markdown:', text.substring(0, 50) + '...');
-        content.innerHTML = marked.parse(text);
+    if (type === 'bot') {
+        content.innerHTML = parseMarkdown(text);
     } else {
-        if (type === 'bot') {
-            console.warn('⚠️ marked is not defined, using plain text');
-        }
         content.textContent = text;
     }
-    
+
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);
     container.appendChild(messageDiv);
-    
+
     // Scroll to bottom
     container.scrollTop = container.scrollHeight;
 }
@@ -735,17 +822,17 @@ function addMessageToDOM(text, type) {
 function addMessage(text, type) {
     // Add to DOM
     addMessageToDOM(text, type);
-    
+
     // Save to conversation history
     conversationHistory.push({ text, type, timestamp: Date.now() });
-    
+
     // Update session
     saveCurrentSession();
 }
 
 function showTypingIndicator() {
     const container = document.getElementById('chatMessages');
-    
+
     const indicator = document.createElement('div');
     indicator.className = 'message bot typing-indicator';
     indicator.id = 'typingIndicator';
@@ -757,7 +844,7 @@ function showTypingIndicator() {
             </div>
         </div>
     `;
-    
+
     container.appendChild(indicator);
     container.scrollTop = container.scrollHeight;
 }
@@ -780,7 +867,7 @@ function attachFile() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,.pdf,.doc,.docx,.txt';
-    input.onchange = function(e) {
+    input.onchange = function (e) {
         const file = e.target.files[0];
         if (file) {
             // Handle file upload
@@ -795,7 +882,7 @@ function voiceInput() {
     if ('webkitSpeechRecognition' in window) {
         const recognition = new webkitSpeechRecognition();
         recognition.lang = document.documentElement.lang === 'ar' ? 'ar-SA' : 'en-US';
-        recognition.onresult = function(event) {
+        recognition.onresult = function (event) {
             const text = event.results[0][0].transcript;
             document.getElementById('messageInput').value = text;
         };
@@ -813,14 +900,14 @@ async function loadCustomWidgets() {
         const response = await fetch('/api/widgets');
         const data = await response.json();
         const allWidgets = data.widgets || [];
-        
+
         // Update default widget visibility based on active state
         updateDefaultWidgets(allWidgets);
-        
+
         // Load only active custom widgets
         const activeCustomWidgets = allWidgets.filter(w => w.type === 'custom' && w.html_content && w.active);
         renderCustomWidgets(activeCustomWidgets);
-        
+
     } catch (error) {
         console.error('Error loading widgets:', error);
     }
@@ -828,7 +915,7 @@ async function loadCustomWidgets() {
 
 function updateDefaultWidgets(allWidgets) {
     const defaultWidgetIds = ['ai-models', 'chat-stats', 'system-status', 'quick-actions'];
-    
+
     defaultWidgetIds.forEach(widgetId => {
         const widgetElement = document.querySelector(`[data-widget-id="${widgetId}"]`);
         if (widgetElement) {
@@ -846,7 +933,7 @@ function updateDefaultWidgets(allWidgets) {
 function renderCustomWidgets(widgets) {
     const container = document.getElementById('customWidgetsContainer');
     if (!container) return;
-    
+
     container.innerHTML = widgets.map(widget => `
         <div class="desktop-widget custom-widget" data-widget-id="${widget.id}">
             <div class="widget-header">
@@ -898,10 +985,10 @@ function initSettings() {
     if (saved) {
         Object.assign(settingsState, JSON.parse(saved));
     }
-    
+
     // Apply settings to UI
     applySettingsToUI();
-    
+
     // Setup event listeners
     setupSettingsEventListeners();
 }
@@ -912,27 +999,27 @@ function showSettingsTab(tabName) {
     document.querySelectorAll('.settings-tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    
+
     // Remove active from all nav items
     document.querySelectorAll('.settings-nav-item').forEach(item => {
         item.classList.remove('active');
     });
-    
+
     // Show selected tab
     const selectedTab = document.getElementById('tab-' + tabName);
     if (selectedTab) {
         selectedTab.classList.add('active');
     }
-    
+
     // Activate nav item
     const navItems = document.querySelectorAll('.settings-nav-item');
     navItems.forEach(item => {
-        if (item.textContent.trim().toLowerCase().includes(tabName) || 
+        if (item.textContent.trim().toLowerCase().includes(tabName) ||
             item.onclick?.toString().includes(tabName)) {
             item.classList.add('active');
         }
     });
-    
+
     // Find the correct nav item by its onclick handler
     document.querySelectorAll('.settings-nav-item').forEach(item => {
         const onclickStr = item.getAttribute('onclick');
@@ -947,11 +1034,11 @@ function applySettingsToUI() {
     // AI Model
     const modelSelect = document.getElementById('aiModelSelect');
     if (modelSelect) modelSelect.value = settingsState.aiModel;
-    
+
     // AI Provider
     const providerSelect = document.getElementById('aiProvider');
     if (providerSelect) providerSelect.value = settingsState.aiProvider;
-    
+
     // Temperature
     const tempSlider = document.getElementById('temperatureSlider');
     const tempValue = document.getElementById('temperatureValue');
@@ -959,7 +1046,7 @@ function applySettingsToUI() {
         tempSlider.value = settingsState.temperature * 100;
         if (tempValue) tempValue.textContent = settingsState.temperature;
     }
-    
+
     // Top P
     const topPSlider = document.getElementById('topPSlider');
     const topPValue = document.getElementById('topPValue');
@@ -967,15 +1054,15 @@ function applySettingsToUI() {
         topPSlider.value = settingsState.topP * 100;
         if (topPValue) topPValue.textContent = settingsState.topP;
     }
-    
+
     // Max Tokens
     const maxTokensSelect = document.getElementById('maxTokens');
     if (maxTokensSelect) maxTokensSelect.value = settingsState.maxTokens;
-    
+
     // System Prompt
     const systemPrompt = document.getElementById('systemPrompt');
     if (systemPrompt) systemPrompt.value = settingsState.systemPrompt;
-    
+
     // Toggle switches
     const toggles = {
         'autoDarkMode': settingsState.autoDarkMode,
@@ -984,16 +1071,16 @@ function applySettingsToUI() {
         'showTimestamps': settingsState.showTimestamps,
         'streamResponses': settingsState.streamResponses
     };
-    
+
     Object.entries(toggles).forEach(([id, value]) => {
         const toggle = document.getElementById(id);
         if (toggle) toggle.checked = value;
     });
-    
+
     // Timezone
     const timezoneSelect = document.getElementById('timezoneSelect');
     if (timezoneSelect) timezoneSelect.value = settingsState.timezone;
-    
+
     // Apply animations setting
     if (!settingsState.animationsEnabled) {
         document.body.classList.add('no-animations');
@@ -1005,73 +1092,73 @@ function setupSettingsEventListeners() {
     // Temperature Slider
     const tempSlider = document.getElementById('temperatureSlider');
     if (tempSlider) {
-        tempSlider.addEventListener('input', function() {
+        tempSlider.addEventListener('input', function () {
             const value = (parseInt(this.value) / 100).toFixed(1);
             document.getElementById('temperatureValue').textContent = value;
             settingsState.temperature = parseFloat(value);
             saveSettings();
         });
     }
-    
+
     // Top P Slider
     const topPSlider = document.getElementById('topPSlider');
     if (topPSlider) {
-        topPSlider.addEventListener('input', function() {
+        topPSlider.addEventListener('input', function () {
             const value = (parseInt(this.value) / 100).toFixed(1);
             document.getElementById('topPValue').textContent = value;
             settingsState.topP = parseFloat(value);
             saveSettings();
         });
     }
-    
+
     // AI Model Select
     const modelSelect = document.getElementById('aiModelSelect');
     if (modelSelect) {
-        modelSelect.addEventListener('change', function() {
+        modelSelect.addEventListener('change', function () {
             settingsState.aiModel = this.value;
             saveSettings();
             showSettingsNotification('تم تغيير نموذج الذكاء الاصطناعي');
         });
     }
-    
+
     // AI Provider Select
     const providerSelect = document.getElementById('aiProvider');
     if (providerSelect) {
-        providerSelect.addEventListener('change', function() {
+        providerSelect.addEventListener('change', function () {
             settingsState.aiProvider = this.value;
             saveSettings();
             showSettingsNotification('تم تغيير مزود الخدمة');
         });
     }
-    
+
     // Max Tokens
     const maxTokensSelect = document.getElementById('maxTokens');
     if (maxTokensSelect) {
-        maxTokensSelect.addEventListener('change', function() {
+        maxTokensSelect.addEventListener('change', function () {
             settingsState.maxTokens = parseInt(this.value);
             saveSettings();
         });
     }
-    
+
     // System Prompt
     const systemPrompt = document.getElementById('systemPrompt');
     if (systemPrompt) {
-        systemPrompt.addEventListener('change', function() {
+        systemPrompt.addEventListener('change', function () {
             settingsState.systemPrompt = this.value;
             saveSettings();
             showSettingsNotification('تم تحديث تعليمات النظام');
         });
     }
-    
+
     // Timezone
     const timezoneSelect = document.getElementById('timezoneSelect');
     if (timezoneSelect) {
-        timezoneSelect.addEventListener('change', function() {
+        timezoneSelect.addEventListener('change', function () {
             settingsState.timezone = this.value;
             saveSettings();
         });
     }
-    
+
     // Toggle Switches
     setupToggleListeners();
 }
@@ -1085,11 +1172,11 @@ function setupToggleListeners() {
         'showTimestamps': { key: 'showTimestamps', action: null },
         'streamResponses': { key: 'streamResponses', action: null }
     };
-    
+
     Object.entries(toggleMappings).forEach(([id, config]) => {
         const toggle = document.getElementById(id);
         if (toggle) {
-            toggle.addEventListener('change', function() {
+            toggle.addEventListener('change', function () {
                 settingsState[config.key] = this.checked;
                 saveSettings();
                 if (config.action) config.action(this.checked);
@@ -1114,7 +1201,7 @@ function showSettingsNotification(message) {
     // Remove existing notification
     const existing = document.querySelector('.settings-toast');
     if (existing) existing.remove();
-    
+
     const notification = document.createElement('div');
     notification.className = 'settings-toast';
     notification.innerHTML = `
@@ -1123,9 +1210,9 @@ function showSettingsNotification(message) {
         </svg>
         <span>${message}</span>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => notification.classList.add('show'), 10);
     setTimeout(() => {
         notification.classList.remove('show');
@@ -1140,7 +1227,7 @@ function exportData() {
         chatSessions: chatSessions,
         exportDate: new Date().toISOString()
     };
-    
+
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1148,7 +1235,7 @@ function exportData() {
     a.download = `ai-chat-backup-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    
+
     showSettingsNotification('تم تصدير البيانات بنجاح');
 }
 
@@ -1157,27 +1244,27 @@ function importData() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = function(e) {
+    input.onchange = function (e) {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             try {
                 const data = JSON.parse(e.target.result);
-                
+
                 if (data.settings) {
                     Object.assign(settingsState, data.settings);
                     saveSettings();
                     applySettingsToUI();
                 }
-                
+
                 if (data.chatSessions) {
                     chatSessions = data.chatSessions;
                     saveChatSessions();
                     renderChatHistory();
                 }
-                
+
                 showSettingsNotification('تم استيراد البيانات بنجاح');
             } catch (error) {
                 showSettingsNotification('فشل في قراءة الملف');
@@ -1196,12 +1283,12 @@ function clearAllData() {
         // Clear localStorage
         localStorage.removeItem('appSettings');
         localStorage.removeItem('chatSessions');
-        
+
         // Reset state
         chatSessions = [];
         conversationHistory = [];
         currentSessionId = null;
-        
+
         // Reload page
         window.location.reload();
     }
@@ -1231,7 +1318,7 @@ function resetSettings() {
             clearOnClose: false,
             timezone: 'Asia/Riyadh'
         };
-        
+
         Object.assign(settingsState, defaults);
         saveSettings();
         applySettingsToUI();
@@ -1259,14 +1346,14 @@ function toggleChatSearch() {
 function searchMessages(query) {
     const resultsCount = document.getElementById('searchResultsCount');
     const messages = document.querySelectorAll('.message .message-content');
-    
+
     clearSearchHighlights();
-    
+
     if (!query.trim()) {
         resultsCount.textContent = '';
         return;
     }
-    
+
     let count = 0;
     messages.forEach(msg => {
         const text = msg.textContent.toLowerCase();
@@ -1277,7 +1364,7 @@ function searchMessages(query) {
             msg.innerHTML = msg.textContent.replace(regex, '<mark class="search-highlight">$1</mark>');
         }
     });
-    
+
     resultsCount.textContent = count > 0 ? `${count} نتيجة` : 'لا توجد نتائج';
 }
 
@@ -1294,20 +1381,20 @@ function exportChat() {
         alert('لا توجد رسائل لتصديرها');
         return;
     }
-    
+
     const session = chatSessions.find(s => s.id === currentSessionId);
     const title = session ? session.title : 'محادثة';
-    
+
     let content = `# ${title}\n`;
     content += `التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n\n`;
     content += '---\n\n';
-    
+
     conversationHistory.forEach(msg => {
         const role = msg.type === 'user' ? '👤 أنت' : '🤖 المساعد';
         const time = new Date(msg.timestamp).toLocaleTimeString('ar-SA');
         content += `**${role}** (${time}):\n${msg.text}\n\n`;
     });
-    
+
     // Create download
     const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -1328,14 +1415,14 @@ function toggleChatSettings() {
 // Handle Input Keydown
 function handleInputKeydown(event) {
     const textarea = event.target;
-    
+
     // Send on Enter (without Shift)
     if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
         sendMessage();
         return;
     }
-    
+
     // Command detection (/)
     if (event.key === '/' && textarea.value === '') {
         showCommandMenu();
@@ -1346,7 +1433,7 @@ function handleInputKeydown(event) {
 function autoResizeTextarea(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
-    
+
     // Update character count
     const charCount = document.getElementById('charCount');
     if (charCount) {
@@ -1360,12 +1447,12 @@ let recognition = null;
 
 function toggleVoiceInput() {
     const voiceBtn = document.getElementById('voiceBtn');
-    
+
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
         alert('المتصفح لا يدعم الإدخال الصوتي');
         return;
     }
-    
+
     if (isRecording) {
         stopVoiceInput();
     } else {
@@ -1376,23 +1463,23 @@ function toggleVoiceInput() {
 function startVoiceInput() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
-    
+
     recognition.lang = document.documentElement.lang === 'ar' ? 'ar-SA' : 'en-US';
     recognition.continuous = true;
     recognition.interimResults = true;
-    
+
     const voiceBtn = document.getElementById('voiceBtn');
     const textarea = document.getElementById('messageInput');
     const statusText = document.getElementById('chatStatusText');
-    
-    recognition.onstart = function() {
+
+    recognition.onstart = function () {
         isRecording = true;
         voiceBtn.classList.add('recording');
         if (statusText) statusText.textContent = 'جارٍ الاستماع...';
         updateStatusIndicator('typing');
     };
-    
-    recognition.onresult = function(event) {
+
+    recognition.onresult = function (event) {
         let transcript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
             transcript += event.results[i][0].transcript;
@@ -1400,16 +1487,16 @@ function startVoiceInput() {
         textarea.value = transcript;
         autoResizeTextarea(textarea);
     };
-    
-    recognition.onerror = function(event) {
+
+    recognition.onerror = function (event) {
         console.error('Speech recognition error:', event.error);
         stopVoiceInput();
     };
-    
-    recognition.onend = function() {
+
+    recognition.onend = function () {
         stopVoiceInput();
     };
-    
+
     recognition.start();
 }
 
@@ -1418,10 +1505,10 @@ function stopVoiceInput() {
         recognition.stop();
     }
     isRecording = false;
-    
+
     const voiceBtn = document.getElementById('voiceBtn');
     const statusText = document.getElementById('chatStatusText');
-    
+
     voiceBtn.classList.remove('recording');
     if (statusText) statusText.textContent = 'جاهز للمساعدة';
     updateStatusIndicator('online');
@@ -1439,16 +1526,16 @@ function updateStatusIndicator(status) {
 function insertEmoji() {
     const emojis = ['😊', '👍', '🎉', '💡', '🚀', '✨', '🔥', '💪', '👏', '🙏', '❤️', '⭐'];
     const textarea = document.getElementById('messageInput');
-    
+
     // Simple emoji picker
     const picker = document.createElement('div');
     picker.className = 'emoji-picker';
     picker.innerHTML = emojis.map(e => `<button onclick="insertEmojiChar('${e}')">${e}</button>`).join('');
-    
+
     // Position and show
     const inputArea = document.querySelector('.input-container-modern');
     inputArea.appendChild(picker);
-    
+
     // Close on outside click
     setTimeout(() => {
         document.addEventListener('click', function closeEmoji(e) {
@@ -1467,7 +1554,7 @@ function insertEmojiChar(emoji) {
     textarea.value = textarea.value.substring(0, start) + emoji + textarea.value.substring(end);
     textarea.focus();
     textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
-    
+
     // Remove picker
     const picker = document.querySelector('.emoji-picker');
     if (picker) picker.remove();
@@ -1482,7 +1569,7 @@ function showCommandMenu() {
         { cmd: '/help', desc: 'عرض المساعدة' },
         { cmd: '/model', desc: 'تغيير النموذج' }
     ];
-    
+
     const menu = document.createElement('div');
     menu.className = 'command-menu';
     menu.innerHTML = commands.map(c => `
@@ -1491,10 +1578,10 @@ function showCommandMenu() {
             <span class="command-desc">${c.desc}</span>
         </button>
     `).join('');
-    
+
     const inputArea = document.querySelector('.input-container-modern');
     inputArea.appendChild(menu);
-    
+
     // Close on escape or outside click
     function closeMenu(e) {
         if (e.key === 'Escape' || (e.type === 'click' && !menu.contains(e.target))) {
@@ -1503,7 +1590,7 @@ function showCommandMenu() {
             document.removeEventListener('click', closeMenu);
         }
     }
-    
+
     setTimeout(() => {
         document.addEventListener('keydown', closeMenu);
         document.addEventListener('click', closeMenu);
@@ -1513,8 +1600,8 @@ function showCommandMenu() {
 function executeCommand(cmd) {
     const textarea = document.getElementById('messageInput');
     textarea.value = '';
-    
-    switch(cmd) {
+
+    switch (cmd) {
         case '/clear':
             if (confirm('مسح المحادثة الحالية؟')) {
                 conversationHistory = [];
@@ -1540,7 +1627,7 @@ function executeCommand(cmd) {
             setTimeout(() => showSettingsTab('ai'), 100);
             break;
     }
-    
+
     // Remove menu
     const menu = document.querySelector('.command-menu');
     if (menu) menu.remove();
@@ -1550,39 +1637,39 @@ function executeCommand(cmd) {
 function addMessageToDOM(text, type, timestamp = null) {
     const container = document.getElementById('chatMessages');
     if (!container) return;
-    
+
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
-    
+
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
     avatar.textContent = type === 'user' ? 'أ' : 'AI';
-    
+
     const contentWrapper = document.createElement('div');
     contentWrapper.className = 'message-content-wrapper';
-    
+
     const content = document.createElement('div');
     content.className = 'message-content';
-    
+
     // Parse markdown if enabled
     if (settingsState?.markdownEnabled) {
         content.innerHTML = parseMarkdown(text);
     } else {
         content.textContent = text;
     }
-    
+
     contentWrapper.appendChild(content);
-    
+
     // Add timestamp if enabled
     if (settingsState?.showTimestamps) {
         const time = document.createElement('div');
         time.className = 'message-time';
-        time.textContent = timestamp ? 
+        time.textContent = timestamp ?
             new Date(timestamp).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) :
             new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
         contentWrapper.appendChild(time);
     }
-    
+
     // Add actions for bot messages
     if (type === 'bot') {
         const actions = document.createElement('div');
@@ -1605,11 +1692,11 @@ function addMessageToDOM(text, type, timestamp = null) {
         `;
         contentWrapper.appendChild(actions);
     }
-    
+
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(contentWrapper);
     container.appendChild(messageDiv);
-    
+
     // Scroll to bottom
     container.scrollTop = container.scrollHeight;
 }
@@ -1619,17 +1706,17 @@ function parseMarkdown(text) {
     // Code blocks
     text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>');
     text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-    
+
     // Bold and Italic
     text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    
+
     // Links
     text = text.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>');
-    
+
     // Line breaks
     text = text.replace(/\n/g, '<br>');
-    
+
     return text;
 }
 
@@ -1637,7 +1724,7 @@ function parseMarkdown(text) {
 function copyMessage(btn) {
     const content = btn.closest('.message-content-wrapper').querySelector('.message-content');
     const text = content.textContent || content.innerText;
-    
+
     navigator.clipboard.writeText(text).then(() => {
         const originalText = btn.innerHTML;
         btn.innerHTML = `
@@ -1655,20 +1742,20 @@ function copyMessage(btn) {
 // Regenerate Message
 function regenerateMessage() {
     if (conversationHistory.length < 2) return;
-    
+
     // Remove last bot message
     conversationHistory.pop();
     const lastUserMsg = conversationHistory[conversationHistory.length - 1];
-    
+
     // Remove last message from DOM
     const messages = document.querySelectorAll('.message');
     if (messages.length > 0) {
         messages[messages.length - 1].remove();
     }
-    
+
     // Resend
     showTypingIndicator();
-    
+
     fetch('/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1677,17 +1764,17 @@ function regenerateMessage() {
             session_id: currentSessionId
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        hideTypingIndicator();
-        if (data.response) {
-            addMessage(data.response, 'bot');
-        }
-    })
-    .catch(error => {
-        hideTypingIndicator();
-        console.error('Error:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            hideTypingIndicator();
+            if (data.response) {
+                addMessage(data.response, 'bot');
+            }
+        })
+        .catch(error => {
+            hideTypingIndicator();
+            console.error('Error:', error);
+        });
 }
 
 // File Attachment Handler
@@ -1698,37 +1785,37 @@ function attachFile() {
     input.type = 'file';
     input.accept = 'image/*,.pdf,.doc,.docx,.txt,.csv,.json';
     input.multiple = true;
-    
-    input.onchange = function(e) {
+
+    input.onchange = function (e) {
         const files = Array.from(e.target.files);
         files.forEach(file => {
             if (file.size > 10 * 1024 * 1024) {
                 alert(`الملف ${file.name} أكبر من 10MB`);
                 return;
             }
-            
+
             attachedFiles.push(file);
             displayAttachment(file);
         });
     };
-    
+
     input.click();
 }
 
 function displayAttachment(file) {
     const preview = document.getElementById('attachmentsPreview');
     const list = document.getElementById('attachmentsList');
-    
+
     preview.style.display = 'block';
-    
+
     const item = document.createElement('div');
     item.className = 'attachment-item';
-    
+
     let icon = '📄';
     if (file.type.startsWith('image/')) icon = '🖼️';
     else if (file.type === 'application/pdf') icon = '📕';
     else if (file.type.includes('word')) icon = '📘';
-    
+
     item.innerHTML = `
         <span>${icon}</span>
         <span>${file.name}</span>
@@ -1738,14 +1825,14 @@ function displayAttachment(file) {
             </svg>
         </button>
     `;
-    
+
     list.appendChild(item);
 }
 
 function removeAttachment(fileName, btn) {
     attachedFiles = attachedFiles.filter(f => f.name !== fileName);
     btn.parentElement.remove();
-    
+
     if (attachedFiles.length === 0) {
         document.getElementById('attachmentsPreview').style.display = 'none';
     }
