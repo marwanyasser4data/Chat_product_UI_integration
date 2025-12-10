@@ -13,7 +13,19 @@ function simpleMarkdown(text) {
 
     let html = text;
 
-    // Escape HTML first
+    // PREPROCESSING: Fix concatenated patterns by adding newlines
+    // Add newlines before list markers that follow other text
+    html = html.replace(/([^\n])(\s*- )/g, '$1\n$2');
+    html = html.replace(/([^\n])(\s*\* )/g, '$1\n$2');
+    html = html.replace(/([^\n])(\s*\d+\. )/g, '$1\n$2');
+
+    // Add newlines before headers
+    html = html.replace(/([^\n])(#{1,6} )/g, '$1\n$2');
+
+    // Add newlines before blockquotes
+    html = html.replace(/([^\n])(> )/g, '$1\n$2');
+
+    // Escape HTML
     html = html.replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
@@ -35,25 +47,28 @@ function simpleMarkdown(text) {
     html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
 
-    // Italic
-    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-    html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+    // Italic (be careful not to match list markers)
+    html = html.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
+    html = html.replace(/(?<!_)_([^_\n]+)_(?!_)/g, '<em>$1</em>');
 
     // Strikethrough
     html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>');
 
-    // Unordered lists
+    // Unordered lists - match lines starting with - or *
     html = html.replace(/^[\*\-] (.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
 
     // Ordered lists
     html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+
+    // Wrap consecutive list items in ul/ol
+    html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*<li>)/g, '$1$2');
+    html = html.replace(/(<li>.*<\/li>(\n|<br>)?)+/g, '<ul>$&</ul>');
 
     // Links
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
 
     // Blockquotes
-    html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+    html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
 
     // Horizontal rules
     html = html.replace(/^---+$/gm, '<hr>');
@@ -69,7 +84,7 @@ function simpleMarkdown(text) {
         html = '<p>' + html + '</p>';
     }
 
-    // Clean up empty paragraphs
+    // Clean up empty paragraphs and fix structure
     html = html.replace(/<p><\/p>/g, '');
     html = html.replace(/<p>(<h[1-6]>)/g, '$1');
     html = html.replace(/(<\/h[1-6]>)<\/p>/g, '$1');
@@ -79,6 +94,8 @@ function simpleMarkdown(text) {
     html = html.replace(/(<\/ul>)<\/p>/g, '$1');
     html = html.replace(/<p>(<blockquote>)/g, '$1');
     html = html.replace(/(<\/blockquote>)<\/p>/g, '$1');
+    html = html.replace(/<br>(<ul>)/g, '$1');
+    html = html.replace(/(<\/ul>)<br>/g, '$1');
 
     return html;
 }
