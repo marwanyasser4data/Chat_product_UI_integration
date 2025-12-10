@@ -557,8 +557,10 @@ function sendMessage() {
         
         // Update content with streaming text (parse Markdown)
         if (typeof marked !== 'undefined') {
+            console.log('✅ Streaming markdown update, length:', fullResponse.length);
             botContent.innerHTML = marked.parse(fullResponse);
         } else {
+            console.warn('⚠️ marked not available during streaming');
             botContent.textContent = fullResponse;
         }
         
@@ -712,8 +714,12 @@ function addMessageToDOM(text, type) {
     
     // Parse Markdown for bot messages
     if (type === 'bot' && typeof marked !== 'undefined') {
+        console.log('✅ Parsing markdown:', text.substring(0, 50) + '...');
         content.innerHTML = marked.parse(text);
     } else {
+        if (type === 'bot') {
+            console.warn('⚠️ marked is not defined, using plain text');
+        }
         content.textContent = text;
     }
     
