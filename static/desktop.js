@@ -555,8 +555,12 @@ function sendMessage() {
             container.appendChild(botMessageDiv);
         }
         
-        // Update content with streaming text
-        botContent.textContent = fullResponse;
+        // Update content with streaming text (parse Markdown)
+        if (typeof marked !== 'undefined') {
+            botContent.innerHTML = marked.parse(fullResponse);
+        } else {
+            botContent.textContent = fullResponse;
+        }
         
         // Scroll to bottom
         const container = document.getElementById('chatMessages');
@@ -705,7 +709,13 @@ function addMessageToDOM(text, type) {
     
     const content = document.createElement('div');
     content.className = 'message-content';
-    content.textContent = text;
+    
+    // Parse Markdown for bot messages
+    if (type === 'bot' && typeof marked !== 'undefined') {
+        content.innerHTML = marked.parse(text);
+    } else {
+        content.textContent = text;
+    }
     
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);

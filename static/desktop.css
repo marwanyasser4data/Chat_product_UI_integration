@@ -1919,7 +1919,93 @@ body {
     border-radius: 16px;
     background: var(--bot-message-bg, rgba(255, 255, 255, 0.1));
     color: var(--text-primary);
-    line-height: 1.5;
+    line-height: 1.6;
+}
+
+/* Markdown Styling in Chat Messages */
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4 {
+    margin: 0.5em 0 0.3em 0;
+    font-weight: 600;
+}
+
+.message-content h1 { font-size: 1.3em; }
+.message-content h2 { font-size: 1.2em; }
+.message-content h3 { font-size: 1.1em; }
+
+.message-content p {
+    margin: 0.4em 0;
+}
+
+.message-content ul,
+.message-content ol {
+    margin: 0.5em 0;
+    padding-inline-start: 1.5em;
+}
+
+.message-content li {
+    margin: 0.3em 0;
+}
+
+.message-content code {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+}
+
+.message-content pre {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 0.5em 0;
+}
+
+.message-content pre code {
+    background: transparent;
+    padding: 0;
+}
+
+.message-content blockquote {
+    border-inline-start: 3px solid var(--primary);
+    margin: 0.5em 0;
+    padding-inline-start: 1em;
+    opacity: 0.9;
+}
+
+.message-content table {
+    border-collapse: collapse;
+    margin: 0.5em 0;
+    width: 100%;
+}
+
+.message-content th,
+.message-content td {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    text-align: start;
+}
+
+.message-content th {
+    background: rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+}
+
+.message-content a {
+    color: var(--primary-light, #90caf9);
+    text-decoration: underline;
+}
+
+.message-content strong {
+    font-weight: 600;
+}
+
+.message-content em {
+    font-style: italic;
 }
 
 .message.user .message-content {
