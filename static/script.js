@@ -151,7 +151,25 @@ function addMessage(text, sender) {
 
     const content = document.createElement('div');
     content.className = 'message-content';
-    content.textContent = text;
+    
+    // For bot messages, parse Markdown to HTML
+    if (sender === 'bot' && typeof marked !== 'undefined') {
+        try {
+            // Configure marked for safe rendering
+            marked.setOptions({
+                breaks: true,        // Convert \n to <br>
+                gfm: true,           // GitHub Flavored Markdown (tables, etc.)
+                headerIds: false,    // Don't add IDs to headers
+                mangle: false        // Don't mangle email addresses
+            });
+            content.innerHTML = marked.parse(text);
+        } catch (e) {
+            console.error('Markdown parsing error:', e);
+            content.textContent = text;
+        }
+    } else {
+        content.textContent = text;
+    }
 
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(content);

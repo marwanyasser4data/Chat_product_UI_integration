@@ -4,18 +4,18 @@
         "primary_dark": "#008542",
         "primary_light": "#e8f5e9",
         "secondary": "#1e88e5",
-        "background": "#323a44",
-        "sidebar": "#000000",
-        "sidebar_text": "#ffffff",
-        "text_primary": "#ffffff",
-        "text_secondary": "#ffffff",
-        "user_msg_bg": "#f0f4f8",
+        "background": "#ffffff",
+        "sidebar": "#1b4297",
+        "sidebar_text": "#000000",
+        "text_primary": "#000000",
+        "text_secondary": "#000000",
+        "user_msg_bg": "#000000",
         "bot_msg_bg": "#ffffff",
         "ai_badge_bg": "#00a651",
         "taskbar_icons_color": "#ffffff",
         "app_title_color": "#ffffff",
-        "header_bar_bg_color": "#19192d",
-        "widget_bg_color": "#1e1e32",
+        "header_bar_bg_color": "#1b4297",
+        "widget_bg_color": "#1b4297",
         "widget_border_color": "#ffffff",
         "widget_title_color": "#ffffff",
         "widget_text_color": "#cccccc",
@@ -25,10 +25,10 @@
         "widget_icon_actions": "#ff6b6b"
     },
     "opacity": {
-        "sidebar": 100,
-        "background": 100,
-        "widget": 50,
-        "chat_msg": 52
+        "sidebar": 0,
+        "background": 0,
+        "widget": 0,
+        "chat_msg": 0
     },
     "font": "Cairo",
     "app_name": {
@@ -44,5 +44,5 @@
         "text": "",
         "url": "/static/uploads/Al-Rajhi.webp"
     },
-    "background_image": "/static/uploads/633c412d64887309_abstract-design-background-smooth-flowing-lines.jpg"
+    "background_image": "/static/uploads/f17f6937ab76a486_Menu1.png"
 }

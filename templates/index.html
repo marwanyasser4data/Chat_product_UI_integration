@@ -321,6 +321,7 @@
     <script>
         const initialLang = "{{ lang }}";
     </script>
+    <script src="{{ url_for('static', filename='marked.min.js') }}"></script>
     <script src="{{ url_for('static', filename='translations.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}?v={{ timestamp }}"></script>
     <script src="{{ url_for('static', filename='settings.js') }}"></script>
