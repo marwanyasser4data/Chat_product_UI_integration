@@ -624,7 +624,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--text-primary);
+    color: white;
     font-weight: 500;
     font-size: 0.9rem;
 }
@@ -771,7 +771,7 @@ body {
 }
 
 .history-header {
-    color: var(--text-secondary);
+    color: white;
     font-size: 0.8rem;
     margin-bottom: 10px;
 }
@@ -812,7 +812,7 @@ body {
 }
 
 .history-title {
-    color: var(--text-primary);
+    color: white;
     font-size: 0.85rem;
     white-space: nowrap;
     overflow: hidden;
@@ -820,7 +820,7 @@ body {
 }
 
 .history-date {
-    color: var(--text-secondary);
+    color: white;
     font-size: 0.7rem;
 }
 
@@ -3197,7 +3197,7 @@ body.light-mode .start-menu {
     display: flex;
     align-items: flex-end;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgb(0 0 0 / 9%);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 20px;
     padding: 10px 14px;

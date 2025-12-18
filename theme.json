@@ -1,19 +1,19 @@
 {
     "colors": {
-        "primary": "#00a651",
-        "primary_dark": "#008542",
-        "primary_light": "#e8f5e9",
-        "secondary": "#1e88e5",
+        "primary": "#000000",
+        "primary_dark": "#000000",
+        "primary_light": "#000000",
+        "secondary": "#ffffff",
         "background": "#ffffff",
         "sidebar": "#1b4297",
         "sidebar_text": "#000000",
         "text_primary": "#000000",
         "text_secondary": "#000000",
         "user_msg_bg": "#000000",
-        "bot_msg_bg": "#ffffff",
+        "bot_msg_bg": "#000000",
         "ai_badge_bg": "#00a651",
-        "taskbar_icons_color": "#ffffff",
-        "app_title_color": "#ffffff",
+        "taskbar_icons_color": "#1b4297",
+        "app_title_color": "#000000",
         "header_bar_bg_color": "#1b4297",
         "widget_bg_color": "#1b4297",
         "widget_border_color": "#ffffff",
@@ -27,8 +27,8 @@
     "opacity": {
         "sidebar": 0,
         "background": 0,
-        "widget": 0,
-        "chat_msg": 0
+        "widget": 11,
+        "chat_msg": 100
     },
     "font": "Cairo",
     "app_name": {
@@ -44,5 +44,5 @@
         "text": "",
         "url": "/static/uploads/Al-Rajhi.webp"
     },
-    "background_image": "/static/uploads/f17f6937ab76a486_Menu1.png"
+    "background_image": "/static/uploads/6bbec7d2daac10e1_86817285-abstract-artificial-intelligence-technology-web-background-virtual-concept.jpg"
 }
