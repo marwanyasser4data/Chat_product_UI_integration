@@ -159,6 +159,9 @@ function openWindow(windowId) {
     if (!windowState.openWindows.includes(windowId)) {
         windowState.openWindows.push(windowId);
     }
+
+    // Add class to body to hide footer logo
+    document.body.classList.add('window-open');
 }
 
 function closeWindow(windowId) {
@@ -176,6 +179,11 @@ function closeWindow(windowId) {
         if (index > -1) {
             windowState.openWindows.splice(index, 1);
         }
+
+        // Remove class from body if no windows are open
+        if (windowState.openWindows.length === 0) {
+            document.body.classList.remove('window-open');
+        }
     }, 200);
 }
 
@@ -185,6 +193,11 @@ function minimizeWindow(windowId) {
 
     window.style.display = 'none';
     updateTaskbarButton(windowId, false);
+
+    // Remove class from body if no windows are open
+    if (windowState.openWindows.length === 0) {
+        document.body.classList.remove('window-open');
+    }
 }
 
 function toggleMaximize(windowId) {
@@ -677,8 +690,63 @@ function sendMessage() {
             container.appendChild(botMessageDiv);
         }
 
-        // Update content with streaming text (parse Markdown)
-        botContent.innerHTML = parseMarkdown(fullResponse);
+        // Clean up raw response BEFORE markdown parsing
+        let cleanedResponse = fullResponse
+            // Remove leading/trailing whitespace and newlines
+            .trim()
+            // Remove excessive newlines at the beginning (keep max 1)
+            .replace(/^(\n|\r\n|\r)+/, '')
+            // Remove excessive newlines (more than 2 consecutive)
+            .replace(/(\n|\r\n|\r){3,}/g, '\n\n')
+            // Remove newlines right before tables
+            .replace(/(\n|\r\n|\r)+(\|.*\|)/g, '\n$2')
+            // Remove newlines right before markdown headers
+            .replace(/(\n|\r\n|\r)+(\#{1,6}\s)/g, '\n$2');
+
+        // Check if content is already HTML (starts with HTML tag)
+        const isHTML = cleanedResponse.trim().startsWith('<');
+
+        let parsedContent;
+        if (isHTML) {
+            // If it's already HTML, use it directly (don't convert newlines to br)
+            parsedContent = cleanedResponse;
+        } else {
+            // Parse markdown only if it's not HTML
+            parsedContent = parseMarkdown(cleanedResponse);
+        }
+
+        // Clean up excessive HTML elements after parsing
+        parsedContent = parsedContent
+            // Remove all br tags at the very beginning
+            .replace(/^(\s*<br\s*\/?>\s*)+/gi, '')
+            // Remove all br tags at the very end
+            .replace(/(\s*<br\s*\/?>\s*)+$/gi, '')
+            // Remove multiple consecutive br tags (keep max 1)
+            .replace(/(<br\s*\/?>\s*){2,}/gi, '<br>')
+            // Remove br before and after tables
+            .replace(/<br\s*\/?>\s*(<table)/gi, '$1')
+            .replace(/(<\/table>)\s*<br\s*\/?>/gi, '$1')
+            // Remove br after opening p tag
+            .replace(/(<p>)\s*<br\s*\/?>/gi, '$1')
+            // Remove br before closing p tag
+            .replace(/<br\s*\/?>\s*(<\/p>)/gi, '$1')
+            // Remove empty paragraphs
+            .replace(/<p>\s*<\/p>/gi, '')
+            // Remove paragraphs with only br
+            .replace(/<p>\s*(<br\s*\/?>)+\s*<\/p>/gi, '')
+            // Remove leading empty paragraphs or whitespace
+            .replace(/^(\s*<p>\s*<\/p>\s*)+/gi, '')
+            // Remove paragraphs between tables
+            .replace(/(<\/table>)\s*<p>\s*<\/p>\s*(<table)/gi, '$1\n$2')
+            // Remove empty paragraphs with only whitespace
+            .replace(/<p>\s*(&nbsp;|\u00A0|\s)*\s*<\/p>/gi, '');
+
+        // Debug: log the content to see what's happening
+        console.log('[Debug] Raw response length:', fullResponse.length);
+        console.log('[Debug] Cleaned response (first 200 chars):', cleanedResponse.substring(0, 200));
+        console.log('[Debug] Parsed content (first 500 chars):', parsedContent.substring(0, 500));
+
+        botContent.innerHTML = parsedContent;
 
         // Scroll to bottom
         const container = document.getElementById('chatMessages');
@@ -1875,3 +1943,51 @@ if (chatSessions.length === 0) {
 // Initialize settings
 initSettings();
 
+// ============ Sidebar Toggle Functions ============
+
+/**
+ * Toggle between History and Filters view in sidebar
+ * @param {string} view - 'history' or 'filters'
+ */
+function toggleSidebarView(view) {
+    const historyPanel = document.querySelector('.chat-history');
+    const filtersPanel = document.querySelector('.filters-panel');
+    const historyBtn = document.querySelector('[data-view="history"]');
+    const filtersBtn = document.querySelector('[data-view="filters"]');
+
+    if (!historyPanel || !filtersPanel || !historyBtn || !filtersBtn) return;
+
+    if (view === 'history') {
+        // Show history, hide filters
+        historyPanel.style.display = 'flex';
+        filtersPanel.style.display = 'none';
+        historyBtn.classList.add('active');
+        filtersBtn.classList.remove('active');
+    } else if (view === 'filters') {
+        // Show filters, hide history
+        historyPanel.style.display = 'none';
+        filtersPanel.style.display = 'flex';
+        historyBtn.classList.remove('active');
+        filtersBtn.classList.add('active');
+    }
+}
+
+/**
+ * Filter entity cards based on search term
+ * @param {string} searchTerm - Search query
+ */
+function filterEntities(searchTerm) {
+    const cards = document.querySelectorAll('.entity-card');
+    const term = searchTerm.toLowerCase().trim();
+
+    cards.forEach(card => {
+        const entityName = card.getAttribute('data-entity-name');
+        if (!entityName) return;
+
+        if (entityName.toLowerCase().includes(term)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}

@@ -1,26 +1,26 @@
 {
     "colors": {
-        "primary": "#000000",
+        "primary": "#ffffff",
         "primary_dark": "#000000",
         "primary_light": "#000000",
         "secondary": "#ffffff",
         "background": "#ffffff",
         "sidebar": "#1b4297",
-        "sidebar_text": "#000000",
+        "sidebar_text": "#ffffff",
         "text_primary": "#000000",
         "text_secondary": "#000000",
         "user_msg_bg": "#000000",
         "bot_msg_bg": "#000000",
         "ai_badge_bg": "#00a651",
-        "taskbar_icons_color": "#1b4297",
+        "taskbar_icons_color": "#ffffff",
         "app_title_color": "#000000",
         "header_bar_bg_color": "#1b4297",
         "widget_bg_color": "#1b4297",
         "widget_border_color": "#ffffff",
         "widget_title_color": "#ffffff",
-        "widget_text_color": "#cccccc",
-        "widget_icon_ai": "#667eea",
-        "widget_icon_chat": "#0078d4",
+        "widget_text_color": "#ffffff",
+        "widget_icon_ai": "#ffffff",
+        "widget_icon_chat": "#ffffff",
         "widget_icon_system": "#00a651",
         "widget_icon_actions": "#ff6b6b"
     },
@@ -44,5 +44,5 @@
         "text": "",
         "url": "/static/uploads/Al-Rajhi.webp"
     },
-    "background_image": "/static/uploads/6bbec7d2daac10e1_86817285-abstract-artificial-intelligence-technology-web-background-virtual-concept.jpg"
+    "background_image": "/static/uploads/720ac5f0fb3c5ca6_Untitled_design_12.jpg"
 }

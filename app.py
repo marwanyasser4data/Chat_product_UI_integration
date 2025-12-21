@@ -877,7 +877,7 @@ def custom_theme_css():
     }}
     
     .taskbar-center {{
-        background: {hex_to_rgba(sidebar_color, 0.15)} !important;
+        background: rgba(27, 66, 151, 0.9) !important;
     }}
     
     /* Taskbar Icons */
@@ -904,7 +904,7 @@ def custom_theme_css():
     /* Buttons */
     .new-chat-btn,
     .send-btn {{
-        background: linear-gradient(135deg, {colors.get('primary', '#00A651')}, {colors.get('primary_dark', '#008542')}) !important;
+        background: linear-gradient(135deg, #000000, #000000) !important;
     }}
     
     .new-chat-btn:hover,
@@ -973,7 +973,6 @@ def custom_theme_css():
     
     /* Desktop Widgets Styling */
     .desktop-widget {{
-        background: {hex_to_rgba(colors.get('widget_bg_color', '#1E1E32'), widget_opacity)} !important;
         border-color: {hex_to_rgba(colors.get('widget_border_color', '#FFFFFF'), widget_opacity)} !important;
     }}
     

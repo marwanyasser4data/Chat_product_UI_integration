@@ -49,6 +49,60 @@
             </div>
         </div>
 
+        <!-- Currency Ticker Marquee -->
+        <div class="currency-ticker">
+            <div class="ticker-content">
+                <span class="ticker-item">
+                    <span class="currency-symbol">💵</span>
+                    <span class="currency-pair">USD/SAR</span>
+                    <span class="currency-price up">3.75</span>
+                    <span class="currency-change up">+0.02%</span>
+                </span>
+                <span class="ticker-item">
+                    <span class="currency-symbol">💶</span>
+                    <span class="currency-pair">EUR/SAR</span>
+                    <span class="currency-price down">4.08</span>
+                    <span class="currency-change down">-0.15%</span>
+                </span>
+                <span class="ticker-item">
+                    <span class="currency-symbol">💷</span>
+                    <span class="currency-pair">GBP/SAR</span>
+                    <span class="currency-price up">4.76</span>
+                    <span class="currency-change up">+0.08%</span>
+                </span>
+                <span class="ticker-item">
+                    <span class="currency-symbol">💴</span>
+                    <span class="currency-pair">JPY/SAR</span>
+                    <span class="currency-price">0.025</span>
+                    <span class="currency-change">0.00%</span>
+                </span>
+                <span class="ticker-item">
+                    <span class="currency-symbol">🇦🇪</span>
+                    <span class="currency-pair">AED/SAR</span>
+                    <span class="currency-price up">1.02</span>
+                    <span class="currency-change up">+0.01%</span>
+                </span>
+                <span class="ticker-item">
+                    <span class="currency-symbol">🇰🇼</span>
+                    <span class="currency-pair">KWD/SAR</span>
+                    <span class="currency-price down">12.23</span>
+                    <span class="currency-change down">-0.05%</span>
+                </span>
+                <span class="ticker-item">
+                    <span class="currency-symbol">₿</span>
+                    <span class="currency-pair">BTC/USD</span>
+                    <span class="currency-price up">43,250</span>
+                    <span class="currency-change up">+2.34%</span>
+                </span>
+                <span class="ticker-item">
+                    <span class="currency-symbol">Ξ</span>
+                    <span class="currency-pair">ETH/USD</span>
+                    <span class="currency-price up">2,285</span>
+                    <span class="currency-change up">+1.87%</span>
+                </span>
+            </div>
+        </div>
+
         <!-- Desktop Widgets Area -->
         <div class="desktop-widgets" id="desktopWidgets">
             <!-- Default Widgets - will be replaced by dynamic widgets if available -->
@@ -224,6 +278,15 @@
             <div id="customWidgetsContainer"></div>
         </div>
 
+        <!-- Footer Logo -->
+        <div class="desktop-footer-logo">
+            {% if theme_settings.logo.type == 'image' and theme_settings.logo.url %}
+            <img src="{{ theme_settings.logo.url }}" alt="Logo" class="footer-logo-image">
+            {% else %}
+            <div class="footer-logo-text">{{ theme_settings.logo.text or 'AI Assistant' }}</div>
+            {% endif %}
+        </div>
+
         <!-- Windows Container -->
         <div class="windows-container" id="windowsContainer">
             <!-- Chat Window -->
@@ -281,12 +344,148 @@
                             <span data-i18n="newChat">محادثة جديدة</span>
                         </button>
 
+                        <!-- Sidebar View Toggle -->
+                        <div class="sidebar-toggle-container">
+                            <button class="sidebar-toggle-btn active" data-view="history"
+                                onclick="toggleSidebarView('history')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span data-i18n="history">History</span>
+                            </button>
+                            <button class="sidebar-toggle-btn" data-view="filters"
+                                onclick="toggleSidebarView('filters')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                <span data-i18n="filters">Filters</span>
+                            </button>
+                        </div>
+
                         <div class="chat-history">
                             <div class="history-header">
                                 <span data-i18n="chatHistory">سجل المحادثات</span>
                             </div>
                             <div class="history-list" id="chatHistoryList">
                                 <div class="no-history" data-i18n="noHistory">لا توجد محادثات سابقة</div>
+                            </div>
+                        </div>
+
+                        <!-- Filters Panel -->
+                        <div class="filters-panel" style="display: none;">
+                            <div class="filters-header">
+                                <div class="filters-title">
+                                    <span class="filters-strategy">Alerts for Strategy: strategy_3285879</span>
+                                    <span class="filters-count">Showing 9 alert(s)</span>
+                                </div>
+                                <button class="show-all-btn">
+                                    <span>Show All Alerts</span>
+                                </button>
+                            </div>
+
+                            <div class="filters-search-container">
+                                <input type="text" class="filters-search" placeholder="Search actionable entity name..."
+                                    oninput="filterEntities(this.value)">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="M21 21l-4.35-4.35" />
+                                </svg>
+                            </div>
+
+                            <div class="entity-cards-container">
+                                <!-- Entity Card 1 -->
+                                <div class="entity-card" data-entity-name="Eloise Pace">
+                                    <div class="entity-header">
+                                        <div class="entity-name">Eloise Pace</div>
+                                        <div class="entity-subtitle">Taxpayers</div>
+                                    </div>
+                                    <div class="entity-details">
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Entity ID:</span>
+                                            <span class="detail-value">1000100</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Entity Name:</span>
+                                            <span class="detail-value">Eloise</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Alert ID:</span>
+                                            <span class="detail-value">57a7258-458d-8ec5-65ea1ceb10</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Status:</span>
+                                            <span class="status-badge active">Active</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Created:</span>
+                                            <span class="detail-value">6/26/2025</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Entity Card 2 -->
+                                <div class="entity-card" data-entity-name="Josef Livingston">
+                                    <div class="entity-header">
+                                        <div class="entity-name">Josef Livingston</div>
+                                        <div class="entity-subtitle">Taxpayers</div>
+                                    </div>
+                                    <div class="entity-details">
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Entity ID:</span>
+                                            <span class="detail-value">1000103</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Entity Name:</span>
+                                            <span class="detail-value">Josef Livingston</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Alert ID:</span>
+                                            <span class="detail-value">6d9c1e0b5-661bd45ae0d5</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Status:</span>
+                                            <span class="status-badge active">Active</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Created:</span>
+                                            <span class="detail-value">6/25/2025</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Entity Card 3 -->
+                                <div class="entity-card" data-entity-name="Destiny Cortes">
+                                    <div class="entity-header">
+                                        <div class="entity-name">Destiny Cortes</div>
+                                        <div class="entity-subtitle">Taxpayers</div>
+                                    </div>
+                                    <div class="entity-details">
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Entity ID:</span>
+                                            <span class="detail-value">1000105</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Entity Name:</span>
+                                            <span class="detail-value">Destiny Cortes</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Alert ID:</span>
+                                            <span class="detail-value">8f2a3b9c-4d5e-6f7g-8h9i</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Status:</span>
+                                            <span class="status-badge active">Active</span>
+                                        </div>
+                                        <div class="entity-detail-item">
+                                            <span class="detail-label">Created:</span>
+                                            <span class="detail-value">6/24/2025</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </aside>
@@ -1619,6 +1818,18 @@
         } else {
             console.error('❌ Failed to load marked.js - marked is undefined');
         }
+    </script>
+
+    <!-- Currency Ticker Script -->
+    <script>
+        // Duplicate ticker content for seamless loop
+        document.addEventListener('DOMContentLoaded', function () {
+            const tickerContent = document.querySelector('.ticker-content');
+            if (tickerContent) {
+                const clone = tickerContent.innerHTML;
+                tickerContent.innerHTML += clone; // Duplicate content for seamless loop
+            }
+        });
     </script>
     <script src="{{ url_for('static', filename='translations.js') }}?v={{ timestamp }}"></script>
     <script src="{{ url_for('static', filename='desktop.js') }}?v={{ timestamp }}"></script>
