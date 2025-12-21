@@ -4130,3 +4130,61 @@ body.light-mode .start-menu {
         display: none;
     }
 }
+
+/* ===== Markdown Table Styles for AI Responses ===== */
+.message-content table {
+    width: auto !important;
+    max-width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.85em;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.message-content thead {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+}
+
+.message-content th,
+.message-content td {
+    padding: 6px 10px !important;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+[dir="rtl"] .message-content th,
+[dir="rtl"] .message-content td {
+    text-align: right;
+}
+
+.message-content th {
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.message-content tbody tr {
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 0.2s;
+}
+
+.message-content tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.message-content tbody tr:hover {
+    background: rgba(var(--primary-rgb, 0, 120, 212), 0.1);
+}
+
+.message-content tbody td {
+    color: var(--text-primary);
+}
