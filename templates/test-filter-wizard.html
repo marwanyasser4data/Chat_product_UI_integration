@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار معالج الفلاتر</title>
+    <link rel="stylesheet" href="../static/filter-wizard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .test-container {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #1e293b;
+            margin-bottom: 16px;
+            font-size: 32px;
+        }
+
+        p {
+            color: #64748b;
+            margin-bottom: 32px;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 48px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 32px;
+            padding: 24px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result h3 {
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .result pre {
+            background: #1e293b;
+            color: #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: left;
+            overflow-x: auto;
+            direction: ltr;
+        }
+
+        .features {
+            margin-top: 40px;
+            text-align: right;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: #475569;
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>🎯 اختبار معالج الفلاتر المتقدم</h1>
+        <p>اضغط على الزر أدناه لفتح معالج الفلاتر واختبار جميع المميزات</p>
+
+        <button class="test-btn" onclick="openFilterWizard()">
+            ✨ فتح معالج الفلاتر
+        </button>
+
+        <div class="result" id="result">
+            <h3>📊 الفلاتر المطبقة:</h3>
+            <pre id="filterOutput"></pre>
+        </div>
+
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-icon">✓</div>
+                <span>3 خطوات متتالية ومترابطة</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✓</div>
+                <span>بطاقات اختيار كبيرة وواضحة</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✓</div>
+                <span>رسوم متحركة سلسة واحترافية</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✓</div>
+                <span>دعم كامل للغة العربية و RTL</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✓</div>
+                <span>تصميم متجاوب لجميع الأجهزة</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include translations -->
+    <script>
+        // Minimal translations for testing
+        const translations = {
+            ar: {
+                filterWizardTitle: 'معالج الفلاتر المتقدم',
+                step1Label: 'نوع البيانات',
+                step2Label: 'الفئة',
+                step3Label: 'التفاصيل',
+                step1Title: 'اختر نوع البيانات',
+                step1Description: 'حدد نوع البيانات التي تريد البحث عنها أو تصفيتها',
+                step2Title: 'اختر الفئة',
+                step2Description: 'حدد الفئة المحددة التي تريد التصفية بناءً عليها',
+                step3Title: 'حدد التفاصيل',
+                step3Description: 'اختر التفاصيل النهائية لتطبيق الفلتر',
+                prevBtn: 'السابق',
+                nextBtn: 'التالي',
+                applyBtn: 'تطبيق الفلتر'
+            }
+        };
+
+        let currentLang = 'ar';
+
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+    </script>
+
+    <!-- Include filter wizard -->
+    <script src="../static/filter-wizard.js"></script>
+
+    <!-- Listen for filter application -->
+    <script>
+        document.addEventListener('filtersApplied', (event) => {
+            const filters = event.detail;
+            const resultDiv = document.getElementById('result');
+            const outputPre = document.getElementById('filterOutput');
+
+            outputPre.textContent = JSON.stringify(filters, null, 2);
+            resultDiv.classList.add('show');
+
+            console.log('✅ Filters applied successfully:', filters);
+        });
+    </script>
+</body>
+
+</html>

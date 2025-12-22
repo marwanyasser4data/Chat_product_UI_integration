@@ -19,8 +19,8 @@
         "widget_border_color": "#ffffff",
         "widget_title_color": "#ffffff",
         "widget_text_color": "#ffffff",
-        "widget_icon_ai": "#ffffff",
-        "widget_icon_chat": "#ffffff",
+        "widget_icon_ai": "#0b9663",
+        "widget_icon_chat": "#ffbd2e",
         "widget_icon_system": "#00a651",
         "widget_icon_actions": "#ff6b6b"
     },

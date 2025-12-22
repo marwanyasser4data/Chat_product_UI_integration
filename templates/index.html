@@ -8,6 +8,7 @@
     <link rel="stylesheet" id="themeStylesheet"
         href="{{ url_for('static', filename='style-' + theme + '.css') }}?v={{ timestamp }}">
     <link rel="stylesheet" href="/custom-theme.css?v={{ timestamp }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='filter-wizard.css') }}?v={{ timestamp }}">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
@@ -93,6 +94,13 @@
                     <p class="header-subtitle" data-i18n="appSubtitle">مساعد ذكي متقدم لخدمتك</p>
                 </div>
                 <div class="header-actions">
+                    <button class="action-btn filter-btn" onclick="openFilterWizard()" title="الفلاتر المتقدمة">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
+                        </svg>
+                        <span data-i18n="advancedFilters">فلاتر متقدمة</span>
+                    </button>
                     {% if user_role == 'admin' %}
                     <button class="action-btn dashboard-btn" onclick="window.location.href='/admin/dashboard'"
                         title="لوحة التحكم">
@@ -325,6 +333,7 @@
     <script src="{{ url_for('static', filename='translations.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}?v={{ timestamp }}"></script>
     <script src="{{ url_for('static', filename='settings.js') }}"></script>
+    <script src="{{ url_for('static', filename='filter-wizard.js') }}?v={{ timestamp }}"></script>
 </body>
 
 </html>

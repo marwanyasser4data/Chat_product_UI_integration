@@ -484,18 +484,19 @@ body {
 }
 
 .stat-number {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .stat-label {
     color: var(--text-secondary);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
 }
 
 /* System Status Widget */
@@ -775,7 +776,7 @@ body {
 
 /* Chat Window Specific */
 .chat-sidebar {
-    width: 280px;
+    width: 340px;
     background: var(--color-sidebar, rgba(0, 0, 0, 0.15));
     backdrop-filter: blur(calc((1 - var(--sidebar-opacity, 1)) * 20px));
     -webkit-backdrop-filter: blur(calc((1 - var(--sidebar-opacity, 1)) * 20px));

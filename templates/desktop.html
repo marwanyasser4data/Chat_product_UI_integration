@@ -8,6 +8,8 @@
         Assistant' }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='desktop.css') }}?v={{ timestamp }}">
     <link rel="stylesheet" href="/custom-theme.css?v={{ timestamp }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='filter-wizard.css') }}?v={{ timestamp }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar-wizard.css') }}?v={{ timestamp }}">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
@@ -374,118 +376,73 @@
                             </div>
                         </div>
 
-                        <!-- Filters Panel -->
+                        <!-- Filters Panel - 3 Step Wizard -->
                         <div class="filters-panel" style="display: none;">
-                            <div class="filters-header">
-                                <div class="filters-title">
-                                    <span class="filters-strategy">Alerts for Strategy: strategy_3285879</span>
-                                    <span class="filters-count">Showing 9 alert(s)</span>
+                            <!-- Wizard Progress -->
+                            <div class="wizard-progress">
+                                <div class="progress-step active" data-step="1">
+                                    <div class="step-number">1</div>
+                                    <div class="step-label">Domain</div>
                                 </div>
-                                <button class="show-all-btn">
-                                    <span>Show All Alerts</span>
+                                <div class="progress-step" data-step="2">
+                                    <div class="step-number">2</div>
+                                    <div class="step-label">Category</div>
+                                </div>
+                                <div class="progress-step" data-step="3">
+                                    <div class="step-number">3</div>
+                                    <div class="step-label">Details</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 1: Data Type -->
+                            <div class="wizard-step active" data-step="1">
+                                <h3 class="step-title">Choose your investigation domain</h3>
+                                <p class="step-description">Select the domain you want to investigate</p>
+
+                                <div class="filter-options" id="step1Options">
+                                    <!-- Will be populated dynamically from database -->
+                                    <div style="text-align: center; padding: 40px; color: rgba(255, 255, 255, 0.6);">
+                                        <div style="margin-bottom: 10px;">Loading domains...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Category -->
+                            <div class="wizard-step" data-step="2" style="display: none;">
+                                <h3 class="step-title">Choose Category</h3>
+                                <p class="step-description">Select the specific category to filter by</p>
+                                <div class="filter-options" id="step2Options">
+                                    <!-- Will be populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Details -->
+                            <div class="wizard-step" data-step="3" style="display: none;">
+                                <h3 class="step-title">Specify Details</h3>
+                                <p class="step-description">Choose the final details for the filter</p>
+                                <div class="filter-options" id="step3Options">
+                                    <!-- Will be populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Wizard Navigation -->
+                            <div class="wizard-navigation">
+                                <button class="wizard-btn wizard-btn-back" id="wizardBackBtn"
+                                    onclick="previousWizardStep()" style="display: none;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                                    </svg>
+                                    Previous
                                 </button>
-                            </div>
-
-                            <div class="filters-search-container">
-                                <input type="text" class="filters-search" placeholder="Search actionable entity name..."
-                                    oninput="filterEntities(this.value)">
-                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <circle cx="11" cy="11" r="8" />
-                                    <path d="M21 21l-4.35-4.35" />
-                                </svg>
-                            </div>
-
-                            <div class="entity-cards-container">
-                                <!-- Entity Card 1 -->
-                                <div class="entity-card" data-entity-name="Eloise Pace">
-                                    <div class="entity-header">
-                                        <div class="entity-name">Eloise Pace</div>
-                                        <div class="entity-subtitle">Taxpayers</div>
-                                    </div>
-                                    <div class="entity-details">
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Entity ID:</span>
-                                            <span class="detail-value">1000100</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Entity Name:</span>
-                                            <span class="detail-value">Eloise</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Alert ID:</span>
-                                            <span class="detail-value">57a7258-458d-8ec5-65ea1ceb10</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Status:</span>
-                                            <span class="status-badge active">Active</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Created:</span>
-                                            <span class="detail-value">6/26/2025</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Entity Card 2 -->
-                                <div class="entity-card" data-entity-name="Josef Livingston">
-                                    <div class="entity-header">
-                                        <div class="entity-name">Josef Livingston</div>
-                                        <div class="entity-subtitle">Taxpayers</div>
-                                    </div>
-                                    <div class="entity-details">
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Entity ID:</span>
-                                            <span class="detail-value">1000103</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Entity Name:</span>
-                                            <span class="detail-value">Josef Livingston</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Alert ID:</span>
-                                            <span class="detail-value">6d9c1e0b5-661bd45ae0d5</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Status:</span>
-                                            <span class="status-badge active">Active</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Created:</span>
-                                            <span class="detail-value">6/25/2025</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Entity Card 3 -->
-                                <div class="entity-card" data-entity-name="Destiny Cortes">
-                                    <div class="entity-header">
-                                        <div class="entity-name">Destiny Cortes</div>
-                                        <div class="entity-subtitle">Taxpayers</div>
-                                    </div>
-                                    <div class="entity-details">
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Entity ID:</span>
-                                            <span class="detail-value">1000105</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Entity Name:</span>
-                                            <span class="detail-value">Destiny Cortes</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Alert ID:</span>
-                                            <span class="detail-value">8f2a3b9c-4d5e-6f7g-8h9i</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Status:</span>
-                                            <span class="status-badge active">Active</span>
-                                        </div>
-                                        <div class="entity-detail-item">
-                                            <span class="detail-label">Created:</span>
-                                            <span class="detail-value">6/24/2025</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <button class="wizard-btn wizard-btn-next" id="wizardNextBtn" onclick="nextWizardStep()"
+                                    disabled>
+                                    Next
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </aside>
@@ -1882,6 +1839,8 @@
             };
         }
     </script>
+    <script src="{{ url_for('static', filename='filter-wizard.js') }}?v={{ timestamp }}"></script>
+    <script src="{{ url_for('static', filename='sidebar-wizard.js') }}?v={{ timestamp }}"></script>
 </body>
 
 </html>

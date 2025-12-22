@@ -287,7 +287,24 @@ const translations = {
         // Widget Stats
         todayStats: 'إحصائيات اليوم',
         conversations: 'المحادثات',
-        messages: 'الرسائل'
+        messages: 'الرسائل',
+
+        // Filter Wizard
+        advancedFilters: 'فلاتر متقدمة',
+        filterWizardTitle: 'معالج الفلاتر المتقدم',
+        step1Label: 'نوع البيانات',
+        step2Label: 'الفئة',
+        step3Label: 'التفاصيل',
+        step1Title: 'اختر نوع البيانات',
+        step1Description: 'حدد نوع البيانات التي تريد البحث عنها أو تصفيتها',
+        step2Title: 'اختر الفئة',
+        step2Description: 'حدد الفئة المحددة التي تريد التصفية بناءً عليها',
+        step3Title: 'حدد التفاصيل',
+        step3Description: 'اختر التفاصيل النهائية لتطبيق الفلتر',
+        prevBtn: 'السابق',
+        nextBtn: 'التالي',
+        applyBtn: 'تطبيق الفلتر'
+
     },
     en: {
         // Header
@@ -576,7 +593,24 @@ const translations = {
         // Widget Stats
         todayStats: 'Today\'s Statistics',
         conversations: 'Conversations',
-        messages: 'Messages'
+        messages: 'Messages',
+
+        // Filter Wizard
+        advancedFilters: 'Advanced Filters',
+        filterWizardTitle: 'Advanced Filter Wizard',
+        step1Label: 'Data Type',
+        step2Label: 'Category',
+        step3Label: 'Details',
+        step1Title: 'Choose Data Type',
+        step1Description: 'Select the type of data you want to search for or filter',
+        step2Title: 'Choose Category',
+        step2Description: 'Select the specific category you want to filter by',
+        step3Title: 'Specify Details',
+        step3Description: 'Choose the final details to apply the filter',
+        prevBtn: 'Previous',
+        nextBtn: 'Next',
+        applyBtn: 'Apply Filter'
+
     }
 };
 
