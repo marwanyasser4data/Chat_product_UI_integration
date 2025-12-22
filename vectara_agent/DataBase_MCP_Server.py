@@ -59,98 +59,12 @@ engine_amlcore = create_engine(
 # Allowed schemas
 # -------------------------------------------------------
 SAFE_SCHEMAS = [
-    "amlprovisioning",
-    "analytics_events",
-    "analytics_execution",
-    "analytics_projects",
-    "analytics_resources",
-    "annotations",
-    "appregistry",
-    "audit",
-    "batch",
-    "catalog",
-    "catalogtablebot",
-    "collaboration",
-    "compute",
-    "connect",
-    "content",
-    "credentials",
-    "data_mining_models",
-    "data_mining_project_resources",
-    "data_mining_project_settings",
-    "data_mining_warehouse",
-    "datadiscovery",
-    "dataflows",
-    "dataplans",
-    "dataprofiles",
-    "dataquality",
-    "datasources",
-    "decisions",
-    "devicemanagement",
-    "discoverytableprovider",
-    "dqrules",
     "fdhdata",
-    "fdhhistory",
-    "fdhmetadata",
-    "feature",
-    "featureflags",
-    "files",
-    "filestore",
-    "geography",
-    "graphtemplates",
-    "identities",
-    "jobexecution",
-    "jobflowscheduling",
-    "launcher",
-    "listdata",
-    "localization",
-    "logon",
-    "metering",
-    "microanalytic",
-    "mlpa",
-    "modelmanagement",
-    "modelmanager",
-    "naturallanguagegeneration",
-    "preferences",
-    "publish",
-    "qkbmanagement",
-    "referencedata",
-    "reportalerts",
-    "reportdistribution",
-    "reportexecution",
-    "reportrenderers",
-    "reportservicesgroup",
-    "rules",
-    "rulesets",
-    "sandconfig",
-    "scheduler",
-    "scoredefinitions",
-    "scoreexecution",
-    "searchindex",
-    "studio",
-    "subjectcontacts",
-    "svi_alerts",
-    "svi_document_generation",
-    "svi_indexer",
+    "svivisualinvestigator",
     "svi_scorecard",
-    "svi_visual_investigator",
-    "svi_vsd_service",
-    "svi_workflow",
-    "svidataexport",
-    "text_analytics_taxonomies",
-    "text_gateway",
-    "transfer",
-    "transformations",
-    "treatmentdefinitions",
-    "visualanalytics",
-    "visualanalyticsapp",
-    "webassets",
-    "webhooks",
-    "workflow",
-    "workflowhistory",
-    "workloadorchestrator",
-    # NEW: core schema from amlcore DB
-    "core",
+    "svidocumentgeneration",
+    "svi_alerts",
+    "core"
 ]
 
 
@@ -158,76 +72,17 @@ SAFE_SCHEMAS = [
 # Intent → schema mapping (for route_schema tool)
 # -------------------------------------------------------
 INTENT_TO_SCHEMA = {
-    # Core AML investigation and alerting
-    "alerts": ["svi_alerts"],
-    "investigation": [
-        "fdhdata",
-        "svi_visual_investigator",
-        "svi_scorecard",
-        "svi_document_generation",
-    ],
-    "workflow": ["svi_workflow", "workflow", "workflowhistory"],
-
-
-    # Risk, scoring, and analytics
-    "risk_score": ["scoreexecution", "scoredefinitions", "data_mining_warehouse"],
-    "analytics": [
-        "analytics_events",
-        "analytics_execution",
-        "analytics_projects",
-        "analytics_resources",
-        "visualanalytics",
-        "visualanalyticsapp",
-        "data_mining_models",
-        "data_mining_project_resources",
-        "data_mining_project_settings",
-    ],
-
-
-    # Decisioning and business logic
-    "decision_logic": ["decisions", "rules", "rulesets", "treatmentdefinitions"],
-
-
-    # Reference and supporting data
-    "reference": ["referencedata", "geography", "preferences", "listdata"],
-    "data_discovery": [
-        "datadiscovery",
-        "datasources",
-        "dataflows",
-        "dataplans",
-        "dataquality",
-    ],
-
-
-    # Party and identity-related (for AML KYC)
-    "party": ["identities", "subjectcontacts", "fdhdata", "fdhmetadata", "fdhhistory"],
-
-
-    # Core transactional data in amlcore
-    "core": ["core"],
-    "transactions": ["core"],  # optional alias
-
-
-    # Other system or platform-level schemas
-    "system": [
-        "audit",
-        "scheduler",
-        "metering",
-        "appregistry",
-        "launcher",
-        "catalog",
-        "connect",
-        "content",
-        "feature",
-        "featureflags",
-        "microanalytic",
-        "qkbmanagement",
-        "sandconfig",
-        "studio",
-    ],
+    "case_investigation": ["fdhdata", "svi_alerts"],
+    "alert_investigation": ["svi_alerts"],
+    "party_customer": ["core", "fdhdata"],
+    "account_analysis": ["core", "fdhdata"],
+    "transaction_analysis": ["core"],
+    "risk_scoring": ["svi_scorecard"],
+    "regulatory_reporting": ["fdhdata"],
+    "documents_narratives": ["svidocumentgeneration"],
+    "visual_investigator_ui": ["svivisualinvestigator"],
+    "audit_system": ["fdhdata", "svivisualinvestigator"]
 }
-
-
 # -------------------------------------------------------
 # MCP server object
 # -------------------------------------------------------
@@ -253,11 +108,6 @@ def _get_engine_for_schema(schema: str):
         return engine_amlcore
     return engine_shared
 
-
-
-
-def _get_allowed_schemas() -> str:
-    return ", ".join(SAFE_SCHEMAS)
 
 
 
@@ -303,53 +153,6 @@ def _list_tables(schema: str) -> str:
         out.append(f"- {name} | {comment or '—'}")
     return "\n".join(out)
 
-
-
-
-def _row_count(schema: str, table: str) -> str:
-    if schema not in SAFE_SCHEMAS:
-        return f"Access denied: schema '{schema}' not allowed."
-
-
-    eng = _get_engine_for_schema(schema)
-
-
-    with eng.connect() as conn:
-        count = conn.execute(
-            text(f'SELECT COUNT(*) FROM "{schema}"."{table}"')
-        ).scalar_one()
-    return str(count)
-
-
-
-
-def _sample_rows(schema: str, table: str, n: int) -> str:
-    if schema not in SAFE_SCHEMAS:
-        return f"Access denied: schema '{schema}' not allowed."
-    if n <= 0:
-        return "Error: n must be > 0."
-
-
-    eng = _get_engine_for_schema(schema)
-
-
-    with eng.connect() as conn:
-        result = conn.execute(
-            text(f'SELECT * FROM "{schema}"."{table}" LIMIT :n'),
-            {"n": n},
-        )
-        rows = result.fetchall()
-        headers = list(result.keys())
-
-
-    if not rows:
-        return "No rows found."
-
-
-    out = [" | ".join(headers)]
-    for row in rows:
-        out.append(" | ".join(str(v) if v is not None else "NULL" for v in row))
-    return "\n".join(out)
 
 
 
@@ -519,15 +322,6 @@ async def list_tools() -> list[Tool]:
     """List available tools for querying AML Postgres."""
     return [
         Tool(
-            name="get_allowed_schemas",
-            description="List schemas that the agent is allowed to access safely.",
-            inputSchema={
-                "type": "object",
-                "properties": {},
-                "required": [],
-            },
-        ),
-        Tool(
             name="route_schema",
             description=(
                 "Given a user intent or question type, return which schema(s) to use. "
@@ -538,7 +332,7 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "intent": {
                         "type": "string",
-                        "description": "High-level AML intent, e.g. 'alerts', 'workflow', 'risk_score'.",
+                        "description":  "High-level AML intent, e.g. 'alerts', 'workflow', 'risk_score'.",
                     }
                 },
                 "required": ["intent"],
@@ -593,46 +387,7 @@ async def list_tools() -> list[Tool]:
                 "required": ["sql_query"],
             },
         ),
-        Tool(
-            name="get_sample_rows",
-            description="Get n sample rows from a safe schema table.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "schema_name": {
-                        "type": "string",
-                        "description": "Schema name, must be allowed.",
-                    },
-                    "table_name": {
-                        "type": "string",
-                        "description": "Table name.",
-                    },
-                    "n": {
-                        "type": "integer",
-                        "description": "Number of rows to sample (default 5).",
-                    },
-                },
-                "required": ["schema_name", "table_name", "n"],
-            },
-        ),
-        Tool(
-            name="get_row_count",
-            description="Return total number of rows in a table from a safe schema.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "schema_name": {
-                        "type": "string",
-                        "description": "Schema name, must be allowed.",
-                    },
-                    "table_name": {
-                        "type": "string",
-                        "description": "Table name.",
-                    },
-                },
-                "required": ["schema_name", "table_name"],
-            },
-        ),
+
         Tool(
             name="get_schema_relationships",
             description=(
@@ -648,7 +403,7 @@ async def list_tools() -> list[Tool]:
                 },
                 "required": ["schema_name"],
             },
-        ),
+        )
     ]
 
 
@@ -657,13 +412,6 @@ async def list_tools() -> list[Tool]:
 @mcp_server.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     logger.info(f"call_tool name={name}, arguments={arguments}")
-
-
-    # 1) get_allowed_schemas
-    if name == "get_allowed_schemas":
-        result_text = _get_allowed_schemas()
-        return [TextContent(type="text", text=result_text)]
-
 
     # 2) route_schema
     if name == "route_schema":
@@ -706,29 +454,6 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             return [TextContent(type="text", text=f"Error executing query: {e}")]
 
 
-    # 6) get_sample_rows
-    if name == "get_sample_rows":
-        schema_name = arguments.get("schema_name")
-        table_name = arguments.get("table_name")
-        n = arguments.get("n")
-        if schema_name is None or table_name is None or n is None:
-            raise ValueError("Missing 'schema_name', 'table_name' or 'n' argument.")
-        try:
-            n_int = int(n)
-        except ValueError:
-            raise ValueError("'n' must be an integer.")
-        result_text = _sample_rows(schema_name, table_name, n_int)
-        return [TextContent(type="text", text=result_text)]
-
-
-    # 7) get_row_count
-    if name == "get_row_count":
-        schema_name = arguments.get("schema_name")
-        table_name = arguments.get("table_name")
-        if not schema_name or not table_name:
-            raise ValueError("Missing 'schema_name' or 'table_name' argument.")
-        result_text = _row_count(schema_name, table_name)
-        return [TextContent(type="text", text=result_text)]
 
 
     # 8) get_schema_relationships
