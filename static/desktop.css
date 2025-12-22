@@ -783,7 +783,7 @@ body {
     border-left: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 0 12px 8px 12px;
 }
 
 [dir="ltr"] .chat-sidebar {
@@ -792,10 +792,10 @@ body {
 }
 
 .sidebar-header {
-    margin-bottom: 20px;
+    margin-bottom: -20px;
     display: flex;
     justify-content: center;
-    padding: 15px 0;
+    padding: 0;
 }
 
 .logo {
@@ -806,7 +806,7 @@ body {
 }
 
 .logo-image {
-    max-height: 100px;
+    max-height: 150px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.3));
@@ -831,7 +831,7 @@ body {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     border: none;
     border-radius: 10px;
-    color: white;
+    color: black;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -1570,6 +1570,8 @@ body {
     border-radius: 16px;
     padding: 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: 240px;
+    overflow: hidden;
 }
 
 .clock-widget {
@@ -2963,12 +2965,12 @@ body.light-mode .start-menu {
 .ai-avatar-mini {
     position: absolute;
     inset: 4px;
-    background: linear-gradient(135deg, var(--primary), #764ba2);
+    background: gray;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: rgb(255, 255, 255);
     font-weight: 700;
     font-size: 0.9rem;
 }
@@ -3168,7 +3170,7 @@ body.light-mode .start-menu {
 .capability-icon {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+    background: #5174c2;
     border-radius: 14px;
     display: flex;
     align-items: center;
@@ -4445,8 +4447,8 @@ body.window-open .desktop-footer-logo {
 }
 
 .sidebar-toggle-btn.active {
-    background: linear-gradient(135deg, #7C3AED, #6D28D9);
-    border-color: #7C3AED;
+    background: #1b4297;
+    border-color: #ffffff;
     color: white;
     box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }

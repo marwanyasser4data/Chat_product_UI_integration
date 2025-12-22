@@ -1363,7 +1363,7 @@ def custom_theme_css():
     /* Buttons */
     .new-chat-btn,
     .send-btn {{
-        background: linear-gradient(135deg, #000000, #000000) !important;
+        background: white;
     }}
     
     .new-chat-btn:hover,
