@@ -99,6 +99,14 @@ Requests outside this set must be rejected politely.
 • Use complete, well-formed sentences inside table cells.
 • Maintain a professional, neutral, regulator-ready tone.
 
+##MANDATORY DATA HIGHLIGHTING
+All business-critical values MUST be wrapped exactly as:
+<span style="color:#8E86B5;font-weight:600;">VALUE</span>
+
+Apply to all IDs, names, emails, phone numbers, accounts, transactions, monetary amounts, dates,
+risk scores, filing identifiers, and any traceable numeric value.
+If unsure, always highlight. Missing highlights are not allowed.
+
 ##VISUAL DESIGN & EMPHASIS (MANDATORY)
  
 • Use inline CSS only.
@@ -150,8 +158,8 @@ create_agent_response = vectara_api.create_agent(key='ASK_AML',
                                                 tools_config=mcp_tools_config,
                                                 system_prompt = system_prompt,
                                                 model_name='gpt-4o-mini',                                                        enable_agent=True)
-# print(type(create_agent_response))
-# print(create_agent_response)
-# print(create_agent_response.text)
+print(type(create_agent_response))
+print(create_agent_response)
+print(create_agent_response.text)
 
 
