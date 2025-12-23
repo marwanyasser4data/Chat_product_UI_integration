@@ -126,6 +126,7 @@ IMPORTANT VALUES (Alert Priority, Risk Level, Disposition, Filing Status) MUST b
 • HIGH → soft orange background, dark orange text
 • MEDIUM → soft yellow background, dark yellow/brown text
 • LOW → soft green background, dark green text
+• Do not use Grey color
 
 ##STRUCTURAL ORDER (WHEN DATA EXISTS)
  
